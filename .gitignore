@@ -1,0 +1,5 @@
+dapp/node_modules
+dapp/build
+dapp/app/src/contracts
+*.env
+.DS_Store

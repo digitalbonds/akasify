@@ -1,0 +1,26 @@
+{
+  "name": "akasify",
+  "version": "0.1.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digitalbonds/akasify.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/digitalbonds/akasify/issues"
+  },
+  "homepage": "https://github.com/digitalbonds/akasify#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^2.4.0"
+  }
+}

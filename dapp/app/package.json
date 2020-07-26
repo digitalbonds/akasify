@@ -1,0 +1,49 @@
+{
+  "name": "akasify",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "3box": "^1.20.3",
+    "@ant-design/icons": "^4.2.1",
+    "@drizzle/react-components": "^1.5.1",
+    "@drizzle/react-plugin": "^1.5.1",
+    "@drizzle/store": "^1.5.1",
+    "@unilogin/provider": "^0.6.1",
+    "antd": "^4.4.2",
+    "i18next": "^19.6.2",
+    "i18next-browser-languagedetector": "^5.0.0",
+    "i18next-xhr-backend": "^3.2.2",
+    "profile-hover": "^1.1.2",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-i18next": "^11.7.0",
+    "react-router-dom": "^5.2.0",
+    "react-router-redux": "^4.0.8",
+    "react-scripts": "^3.4.1",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
+    "styled-components": "^5.1.1",
+    "typescript": "^3.9.6"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
