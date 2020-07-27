@@ -1,5 +1,5 @@
 <p align="center">
-  <img align="center" width="30%" src="/documentation/resources/logo_main.svg">
+  <img align="center" width="30%" src="/documentation/logo_main.svg">
 </p>
 
 > Project by **Nestor Bonilla**
