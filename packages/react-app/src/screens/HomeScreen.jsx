@@ -1,13 +1,18 @@
 import React from 'react'
-import { Button, Layout, Row, Typography, Col, Space } from 'antd'
+import { Button, Layout, Row, Typography, Col } from 'antd'
 import { useTranslation } from 'react-i18next'
+import Faucet from '../components/Faucet'
 import akasifyCommunity from '../assets/images/logo_with_phrase.png'
 import * as moment from 'moment'
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Paragraph } = Typography
 
-function LandingPage() {
+function LandingPage({
+  localProvider,
+  mainnetProvider,
+  price
+}) {
 
     const { t } = useTranslation()
 
@@ -32,6 +37,13 @@ function LandingPage() {
               </Col>
             </Row>
           </div>
+          {/* {
+            localProvider && localProvider.connection && localProvider.connection.url && localProvider.connection.url.indexOf("localhost")>=0 && !process.env.REACT_APP_PROVIDER && price > 1 ? (
+              <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider}/>
+            ) : (
+              ""
+            )
+          } */}
         </Content>
         <Footer style={{ textAlign: 'center' }}>Akasify ©{moment(new Date()).format('YYYY')} Created by Digital Bonds</Footer>
       </Layout>

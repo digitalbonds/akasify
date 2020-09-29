@@ -1,8 +1,8 @@
-import React from 'react'
-import { Button } from 'antd'
-import Address from './Address'
-import Balance from './Balance'
-import Wallet from './Wallet'
+import React from "react";
+import { Button } from "antd";
+import Address from "./Address";
+import Balance from "./Balance";
+import Wallet from "./Wallet";
 
 export default function Account({
   address,
@@ -14,16 +14,17 @@ export default function Account({
   web3Modal,
   loadWeb3Modal,
   logoutOfWeb3Modal,
+  blockExplorer,
 }) {
   const modalButtons = [];
   if (web3Modal) {
     if (web3Modal.cachedProvider) {
       modalButtons.push(
         <Button
-          key='logoutbutton'
-          className='connect-button'
-          shape='round'
-          size='large'
+          key="logoutbutton"
+          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
+          shape="round"
+          size="large"
           onClick={logoutOfWeb3Modal}
         >
           logout
@@ -33,7 +34,7 @@ export default function Account({
       modalButtons.push(
         <Button
           key="loginbutton"
-          className='connect-button'
+          style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
           shape="round"
           size="large"
           type={minimized ? "default" : "primary"}
@@ -49,7 +50,7 @@ export default function Account({
     ""
   ) : (
     <span>
-      {address ? <Address value={address} ensProvider={mainnetProvider} /> : "Connecting..."}
+      {address ? <Address value={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} /> : "Connecting..."}
       <Balance address={address} provider={localProvider} dollarMultiplier={price} />
       <Wallet address={address} provider={userProvider} ensProvider={mainnetProvider} price={price} />
     </span>
@@ -57,7 +58,7 @@ export default function Account({
 
   return (
     <div>
-      {/* {display} */}
+      {display}
       {modalButtons}
     </div>
   );

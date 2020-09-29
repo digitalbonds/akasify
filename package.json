@@ -1,40 +1,53 @@
 {
-  "name": "@scaffold-eth/monorepo",
-  "version": "1.0.0",
-  "keywords": [
-    "ethereum",
-    "react",
-    "uniswap",
-    "workspaces",
-    "yarn"
-  ],
-  "private": true,
-  "scripts": {
-    "react-app:build": "yarn workspace @scaffold-eth/react-app build --max-old-space-size=12288",
-    "react-app:eject": "yarn workspace @scaffold-eth/react-app eject",
-    "react-app:start": "yarn workspace @scaffold-eth/react-app start",
-    "react-app:test": "yarn workspace @scaffold-eth/react-app test",
-    "build": "yarn workspace @scaffold-eth/react-app build --max-old-space-size=12288",
-    "chain": "yarn workspace @scaffold-eth/buidler chain",
-    "node": "yarn workspace @scaffold-eth/buidler chain",
-    "test": "yarn workspace @scaffold-eth/buidler test",
-    "start": "yarn workspace @scaffold-eth/react-app start",
-    "compile": "yarn workspace @scaffold-eth/buidler compile",
-    "deploy": "yarn workspace @scaffold-eth/buidler deploy",
-    "watch": "yarn workspace @scaffold-eth/buidler watch",
-    "accounts": "yarn workspace @scaffold-eth/buidler accounts",
-    "balance": "yarn workspace @scaffold-eth/buidler balance",
-    "send": "yarn workspace @scaffold-eth/buidler send",
-    "ipfs": "cd packages/react-app && node ipfs",
-    "surge": "surge packages/react-app/build",
-    "s3": "cd packages/react-app && node s3",
-    "ship": "surge packages/react-app/build",
-    "generate": "cd packages/buidler && npx buidler generate",
-    "account": "cd packages/buidler && npx buidler account"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
+    "name": "@akasify/monorepo",
+    "description": "Youth change-makers decentralized platform.",
+    "version": "1.0.0",
+    "keywords": [
+      "ethereum",
+      "react",
+      "akasify",
+      "social impact",
+      "yarn"
+    ],
+    "repository": {
+        "type" : "git",
+        "url" : "https://github.com/digitalbonds/akasify"
+    },
+    "author": {
+        "name" : "Nestor Bonilla",
+        "email" : "nbonilla@digitalbonds.org",
+        "url" : "https://digitalbonds.org"
+    },
+    "private": true,
+    "scripts": {
+      "react-app:build": "yarn workspace @akasify/react-app build --max-old-space-size=12288",
+      "react-app:eject": "yarn workspace @akasify/react-app eject",
+      "react-app:start": "yarn workspace @akasify/react-app start",
+      "react-app:test": "yarn workspace @akasify/react-app test",
+      "build": "yarn workspace @akasify/react-app build --max-old-space-size=12288",
+      "chain": "yarn workspace @akasify/buidler chain",
+      "node": "yarn workspace @akasify/buidler chain",
+      "test": "yarn workspace @akasify/buidler test",
+      "start": "yarn workspace @akasify/react-app start",
+      "compile": "yarn workspace @akasify/buidler compile",
+      "deploy": "yarn workspace @akasify/buidler deploy",
+      "watch": "yarn workspace @akasify/buidler watch",
+      "accounts": "yarn workspace @akasify/buidler accounts",
+      "balance": "yarn workspace @akasify/buidler balance",
+      "send": "yarn workspace @akasify/buidler send",
+      "ipfs": "yarn workspace @akasify/react-app ipfs",
+      "surge": "yarn workspace @akasify/react-app surge",
+      "s3": "yarn workspace @akasify/react-app s3",
+      "ship": "yarn workspace @akasify/react-app ship",
+      "generate": "cd packages/buidler && npx buidler generate",
+      "account": "cd packages/buidler && npx buidler account",
+      "flatten": "cd packages/buidler && npx buidler flatten",
+      "expose": "cd packages/buidler && npx buidler node"
+    },
+    "workspaces": {
+      "packages": [
+        "packages/*"
+      ]
+    }
   }
-}
+  

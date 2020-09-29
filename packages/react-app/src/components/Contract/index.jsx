@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card } from "antd";
 import { useContractLoader, useContractExistsAtAddress } from "../../hooks";
 import Account from "../Account";
@@ -20,7 +20,10 @@ const noContractDisplay = (
       to see your contract here.
     </div>
     <div style={{ padding: 32 }}>
-      <span style={{ marginRight: 4 }} role="img" aria-label="warning">☢️</span>Warning: You might need to run
+      <span style={{ marginRight: 4 }} role="img" aria-label="warning">
+        ☢️
+      </span>
+      Warning: You might need to run
       <span style={{ marginLeft: 4, backgroundColor: "#f1f1f1", padding: 4, borderRadius: 4, fontWeight: "bolder" }}>
         yarn run deploy
       </span>{" "}
@@ -31,38 +34,40 @@ const noContractDisplay = (
 
 const isQueryable = fn => (fn.stateMutability === "view" || fn.stateMutability === "pure") && fn.inputs.length === 0;
 
-export default function Contract({ account, gasPrice, signer, provider, name, show, price }) {
+export default function Contract({ account, gasPrice, signer, provider, name, show, price, blockExplorer }) {
   const contracts = useContractLoader(provider);
   const contract = contracts ? contracts[name] : "";
   const address = contract ? contract.address : "";
   const contractIsDeployed = useContractExistsAtAddress(provider, address);
-  const writeContracts = useContractLoader(signer);
-  const writeContract = writeContracts ? writeContracts[name] : "";
 
+  const displayedContractFunctions = useMemo(
+    () =>
+      contract
+        ? Object.values(contract.interface.functions).filter(
+            fn => fn.type === "function" && !(show && show.indexOf(fn.name) < 0),
+          )
+        : [],
+    [contract, show],
+  );
 
-  const displayedContractFunctions = useMemo(() =>
-    contract ? Object.values(contract.interface.functions)
-      .filter(fn => fn.type === "function" && !(show && show.indexOf(fn.name) < 0)) : []
-      , [contract, show])
-
-  const contractDisplay = displayedContractFunctions
-    .map(fn => {
-      if (isQueryable(fn)) {
-        // If there are no inputs, just display return value
-        return <DisplayVariable key={fn.name} contractFunction={contract[fn.name]} functionInfo={fn} />;
-      }
-      // If there are inputs, display a form to allow users to provide these
-      return (
-        <FunctionForm
-          key={"FF"+fn.name}
-          contractFunction={writeContract[fn.name]}
-          functionInfo={fn}
-          provider={provider}
-          gasPrice={gasPrice}
-        />
-      );
-    });
-
+  const [refreshRequired, triggerRefresh] = useState(false)
+  const contractDisplay = displayedContractFunctions.map(fn => {
+    if (isQueryable(fn)) {
+      // If there are no inputs, just display return value
+      return <DisplayVariable key={fn.name} contractFunction={contract[fn.name]} functionInfo={fn} refreshRequired={refreshRequired} triggerRefresh={triggerRefresh}/>;
+    }
+    // If there are inputs, display a form to allow users to provide these
+    return (
+      <FunctionForm
+        key={"FF" + fn.name}
+        contractFunction={contract.connect(signer)[fn.name]}
+        functionInfo={fn}
+        provider={provider}
+        gasPrice={gasPrice}
+        triggerRefresh={triggerRefresh}
+      />
+    );
+  });
 
   return (
     <div style={{ margin: "auto", width: "70vw" }}>
@@ -77,6 +82,7 @@ export default function Contract({ account, gasPrice, signer, provider, name, sh
                 injectedProvider={provider}
                 mainnetProvider={provider}
                 price={price}
+                blockExplorer={blockExplorer}
               />
               {account}
             </div>

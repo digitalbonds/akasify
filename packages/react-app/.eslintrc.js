@@ -1,6 +1,7 @@
 module.exports = {
   env: {
     browser: true,
+    es2020: true,
   },
   extends: ["airbnb", 'plugin:prettier/recommended', 'prettier/react'],
   plugins: ["babel"],

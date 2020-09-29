@@ -10,8 +10,8 @@ export default function GasGauge(props) {
       size="large"
       shape="round"
     >
-      <span style={{ marginRight: 8 }}>⛽️</span>
-      {parseInt(props.gasPrice) / 10 ** 8}g
+      <span style={{ marginRight: 8 }}><span role="img" aria-label="fuelpump">⛽️</span></span>
+      {parseInt(props.gasPrice, 10) / 10 ** 9}g
     </Button>
   );
 }

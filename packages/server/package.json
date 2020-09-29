@@ -1,5 +1,5 @@
 {
-  "name": "akasify-server",
+  "name": "@akasify/server",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
@@ -7,8 +7,11 @@
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Nestor Bonilla",
-  "license": "ISC",
+  "author": {
+    "name" : "Nestor Bonilla",
+    "email" : "nbonilla@digitalbonds.org",
+    "url" : "https://digitalbonds.org"
+  },
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

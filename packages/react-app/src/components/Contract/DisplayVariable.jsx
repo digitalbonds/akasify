@@ -4,13 +4,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Row, Col, Divider } from "antd";
 import tryToDisplay from "./utils";
 
-const DisplayVariable = ({ contractFunction, functionInfo }) => {
+const DisplayVariable = ({ contractFunction, functionInfo, refreshRequired, triggerRefresh}) => {
   const [variable, setVariable] = useState("");
-  
+
   const refresh = async () => {
     try {
       const funcResponse = await contractFunction();
       setVariable(funcResponse);
+      triggerRefresh(false);
     } catch (e) {
       console.log(e);
     }
@@ -18,7 +19,7 @@ const DisplayVariable = ({ contractFunction, functionInfo }) => {
 
   useEffect(() => {
     refresh();
-  }, [contractFunction]);
+  }, [refreshRequired, contractFunction]);
 
   return (
     <div>
