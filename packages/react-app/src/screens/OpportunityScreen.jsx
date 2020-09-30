@@ -16,7 +16,8 @@ function OpportunityScreen ({
   gasPrice,
   userProvider,
   localProvider,
-  mainnetProvider
+  mainnetProvider,
+  role
 }) {
   //console.log("local provider ", localProvider);
 
@@ -28,7 +29,7 @@ function OpportunityScreen ({
     
   const length = 250;
 
-  const oppData = () => {        
+  const oppData = () => {
     let data = [];
     if (opportunities) {
         for (let i = 0; i < opportunities[0].length; i++) {
@@ -49,7 +50,7 @@ function OpportunityScreen ({
     return data;
 }
 
-  // const listData = [
+  // const oppData = [
   //     {
   //         id: 0,
   //         name: "Encuentro Regional de Jóvenes Iberoamericanos 2020",
@@ -130,15 +131,17 @@ function OpportunityScreen ({
               marginBottom: 20
             }}>
               <div></div>
-              <div>
-                <Button
-                type="primary"
-                icon={<PlusCircleOutlined />}
-                data-testid="add-contact-button"
-              >
-                <NavLink style={{color: "#FFF"}} to="/manage">Create</NavLink>
-              </Button>
-              </div>
+              {role == "organization" && (
+                <div>
+                  <Button
+                    type="primary"
+                    icon={<PlusCircleOutlined />}
+                    data-testid="add-contact-button"
+                  >
+                    <NavLink style={{color: "#FFF", padding:"12px"}} to="/opportunityedit:0">Create</NavLink>
+                  </Button>
+                </div>
+              )}              
             </div>
           }
           renderItem={item => (
@@ -153,7 +156,7 @@ function OpportunityScreen ({
                 }
                 actions={[
                   <Tooltip placement="bottom" title="views">
-                    <Badge count={1} offset={[15, 0]}><EyeOutlined key="views" /></Badge>
+                    <Badge count={0} offset={[15, 0]}><EyeOutlined key="views" /></Badge>
                   </Tooltip>,
                   <Tooltip placement="bottom" title="saved">
                     <StarOutlined key="bookmark" />

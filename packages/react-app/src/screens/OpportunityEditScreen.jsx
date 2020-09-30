@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Row, Col, Card, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select, Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { useParams, useHistory } from "react-router-dom";
 import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
-import { Transactor } from "../helpers";
 import opportunityAvatar from '../assets/images/opportunity_avatar.png'
 import opportunityImage from '../assets/images/opportunity_detail.png'
 import moment from 'moment';
@@ -24,7 +24,7 @@ function getBase64(file) {
     });
 }
 
-function OpportunityManageScreen ({
+function OpportunityEditScreen ({
   address,
   gasPrice,
   userProvider,
@@ -33,24 +33,29 @@ function OpportunityManageScreen ({
   tx
 }) {
 
+    let { id } = useParams();
+    let history = useHistory();
+
     // Load in your local 📝 contract and read a value from it:
     const readContracts = useContractLoader(localProvider);
-    //console.log("read contracts ", readContracts);
 
     // If you want to make 🔐 write transactions to your contracts, use the userProvider:
     const writeContracts = useContractLoader(userProvider)
-    //console.log("🔐 writeContracts",writeContracts)
 
-    const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
-    console.log("🤗 opportunities:", opportunities);
+    const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
 
-    //const organizations = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizations");
-    //console.log("🤗 organizations:", organizations);
-
-    //const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunity");
-    //console.log("🤗 beneficiaries:", beneficiaries);    
+    //opportunity.organizationId;
+    const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", id.replace(":",""));
+    
+    const oppOrganization = () => {
+        if (organization)
+            return organization[1];
+        return "";
+    }
 
     const [oppForm] = Form.useForm();
+    const [preRequirementForm] = Form.useForm();
+    const [postRequirementForm] = Form.useForm();
 
     const [oppId, setOppId] = useState(0);
     const [oppOrganizationId, setOppOrganizationId] = useState(0);
@@ -92,47 +97,48 @@ function OpportunityManageScreen ({
             </span>
           ),
         }
-      ];
-    
-      const preRequirementData = [
-        {
-          key: '1',
-          id: '1',
-          name: 'Submit cv.',
-          value: '0',
-          type: 'automatic'
-        },
-        {
-          key: '2',
-          id: '2',
-          name: 'Submit commitment letter signed.',
-          value: '0',
-          type: 'automatic'
-        },
-        {
-          key: '3',
-          id: '3',
-          name: 'Send video application.',
-          value: '0',
-          type: 'automatic'
-        },
-      ];
+    ];
 
+    const postRequirementColumns = [
+        {
+          title: 'No.',
+          dataIndex: 'id',
+          key: 'id',
+          render: text => <a>{text}</a>,
+        },
+        {
+          title: 'Name',
+          dataIndex: 'name',
+          key: 'name',
+        },
+        {
+            title: 'Value',
+            dataIndex: 'value',
+            key: 'value',
+          },
+        {
+          title: 'Type',
+          key: 'type',
+          dataIndex: 'type',
+          render: type => (
+            <span>
+                <Tag color={'gray'} key={type}>
+                    {type.toUpperCase()}
+                </Tag>
+            </span>
+          ),
+        }
+    ];
+    
+    const preRequirementData = [];
+
+    const postRequirementData = [];
 
     const onOppFinish = () => {
+        //console.log("transaction sent: ", oppName, ", ", oppDescription, ", ", oppPreRequirementDeadline, ", ", oppPosRequirementDeadline, ", [], [], [], [], [], []");
         tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));
-        // function createOpportunity(
-        //     string memory name,
-        //     string memory description,
-        //     uint[] memory preRequirementTypes,
-        //     uint[] memory preRequirementValues,
-        //     string[] memory preRequirementNames,
-        //     uint[] memory postRequirementTypes,
-        //     uint[] memory postRequirementValues,
-        //     string[] memory postRequirementNames
-        // )
+        //history.push("/opportunity");
     };
-
 
     const uploadButton = (
         <div>
@@ -155,6 +161,7 @@ function OpportunityManageScreen ({
             </Typography>
             <Form
                 layout="vertical"
+                style={{marginTop: "12px"}}
                 form={oppForm}
                 onFinish={onOppFinish}
             >
@@ -177,7 +184,7 @@ function OpportunityManageScreen ({
                     <Input
                         disabled
                         placeholder="organization name"
-                        value={oppOrganizationName} />
+                        value={oppOrganization()} />
                 </Form.Item>
                 <Form.Item
                     name="opp-name"
@@ -302,8 +309,7 @@ function OpportunityManageScreen ({
                         >
                         <img alt="example" style={{ width: '100%' }} />
                     </Modal>
-                </Form.Item>
-                
+                </Form.Item>                
                 <Form.Item>
                     <Row gutter={[100, 16]}>
                         <Col span={1}>
@@ -323,8 +329,8 @@ function OpportunityManageScreen ({
                     />
                     <Form
                         layout="vertical"
-                        form={oppForm}
-                        onFinish={onOppFinish}
+                        style={{marginTop: "12px"}}
+                        form={preRequirementForm}
                     >
                         <Row gutter={[100, 16]}>
                             <Col span={8}>
@@ -391,7 +397,78 @@ function OpportunityManageScreen ({
                     </Form>
                 </TabPane>
                 <TabPane tab="Post requirements" key={2}>
-                Content of Tab Pane 2
+                    <Table
+                        columns={postRequirementColumns}
+                        dataSource={postRequirementData}
+                    />
+                    <Form
+                        layout="vertical"
+                        style={{marginTop: "12px"}}
+                        form={postRequirementForm}
+                    >
+                        <Row gutter={[100, 16]}>
+                            <Col span={8}>
+                                <Form.Item
+                                    name="post-requirement-id"
+                                    label="Id"
+                                    valuePropName="post-requirement-id"
+                                >
+                                    <Input
+                                        placeholder="0"
+                                        disabled/>
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
+                                <Form.Item
+                                    name="post-requirement-type"
+                                    label="Type"
+                                    valuePropName="post-requirement-type"
+                                >
+                                    <Select
+                                        placeholder="Select a type"
+                                        allowClear
+                                    >
+                                        <Option value="simple">simple</Option>
+                                        <Option value="value_required">value required</Option>
+                                        <Option value="automatic transfer">automatic transfer</Option>
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
+                                <Form.Item
+                                    name="post-requirement-value"
+                                    label="Value"
+                                    valuePropName="post-requirement-value"
+                                >
+                                    <Input
+                                        placeholder="0" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Form.Item
+                            name="post-requirement-name"
+                            label="Name"
+                            valuePropName="post-requirement-name"
+                            rules={[
+                                {
+                                required: true,
+                                message: 'Please input the post requirement name',
+                                },
+                            ]}
+                        >
+                            <TextArea
+                                placeholder="name"
+                                autoSize={{ minRows: 2, maxRows: 6 }}
+                            />
+                        </Form.Item>
+                        <Form.Item>
+                            <Row gutter={[100, 16]}>
+                                <Col span={1}>
+                                    <Button type="primary" htmlType="submit">Save</Button>
+                                </Col>
+                            </Row>
+                        </Form.Item>
+                    </Form>
                 </TabPane>
             </Tabs>
         </Layout.Content>
@@ -399,4 +476,4 @@ function OpportunityManageScreen ({
   )
 }
 
-export default OpportunityManageScreen;
+export default OpportunityEditScreen;

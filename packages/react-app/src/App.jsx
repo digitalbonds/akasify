@@ -16,7 +16,7 @@ import { ReactComponent as Logo } from './assets/vectors/akasify_icon.svg';
 import HomeScreen from './screens/HomeScreen'
 import OpportunityScreen from './screens/OpportunityScreen'
 import OpportunityDetailScreen from './screens/OpportunityDetailScreen'
-import OpportunityManageScreen from './screens/OpportunityManageScreen'
+import OpportunityEditScreen from './screens/OpportunityEditScreen'
 import OrganizationScreen from './screens/OrganizationScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import BeneficiaryScreen from './screens/BeneficiaryScreen'
@@ -97,14 +97,14 @@ function App() {
               logoutOfWeb3Modal={logoutOfWeb3Modal}
             />
             <Switch>
-              <Route exact path='/' render={() => <HomeScreen localProvider={localProvider} mainnetProvider={mainnetProvider} price={price} />}/>
-              <Route exact path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
-              <Route exact path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
-              <Route exact path='/manage' render={() => <OpportunityManageScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
-              <Route path='/organization' component={OrganizationScreen} />
+              <Route path='/opportunityedit:id' render={() => <OpportunityEditScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              <Route path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              <Route path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/organization:id' component={OpportunityDetailScreen} />
+              <Route path='/organization' component={OrganizationScreen} />              
               <Route path='/profile' component={ProfileScreen} />
               <Route path='/admin' render={() => <AdminScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              <Route exact path='/' render={() => <HomeScreen localProvider={localProvider} mainnetProvider={mainnetProvider} price={price} />}/>
               
               <Footer className='footer'>© 2020 Created by Digital Bonds</Footer>
             </Switch>
