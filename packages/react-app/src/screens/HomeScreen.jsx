@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Layout, Row, Typography, Col } from 'antd'
 import { useTranslation } from 'react-i18next'
-import Faucet from '../components/Faucet'
+import Faucet from '../../../../packages/react-app/src/components/Faucet'
 import akasifyCommunity from '../assets/images/logo_with_phrase.png'
 import * as moment from 'moment'
 

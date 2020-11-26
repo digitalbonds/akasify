@@ -1,5 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "antd";
+
+/*
+<EtherInput
+  price={props.price}
+  value={amount}
+  onChange={value => {
+    setAmount(value);
+  }}
+/>
+*/
 
 export default function EtherInput(props) {
   const [mode, setMode] = useState(props.price ? "USD" : "ETH");
@@ -42,6 +52,14 @@ export default function EtherInput(props) {
     prefix = "Ξ";
     addonAfter = option("ETH 🔀");
   }
+
+  useEffect(
+    ()=>{
+      if(!currentValue){
+        setDisplay("");
+      }
+    }
+  ,[ currentValue ])
 
   return (
     <Input

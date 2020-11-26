@@ -1,7 +1,7 @@
 {
     "name": "@akasify/monorepo",
     "description": "Youth change-makers decentralized platform.",
-    "version": "1.0.0",
+    "version": "0.0.2",
     "keywords": [
       "ethereum",
       "react",
@@ -19,34 +19,49 @@
         "url" : "https://digitalbonds.org"
     },
     "private": true,
-    "scripts": {
+    "scripts": {      
       "react-app:build": "yarn workspace @akasify/react-app build --max-old-space-size=12288",
       "react-app:eject": "yarn workspace @akasify/react-app eject",
       "react-app:start": "yarn workspace @akasify/react-app start",
       "react-app:test": "yarn workspace @akasify/react-app test",
       "build": "yarn workspace @akasify/react-app build --max-old-space-size=12288",
-      "chain": "yarn workspace @akasify/buidler chain",
-      "node": "yarn workspace @akasify/buidler chain",
-      "test": "yarn workspace @akasify/buidler test",
+      "chain": "yarn workspace @akasify/hardhat chain",
+      "node": "yarn workspace @akasify/hardhat chain",
+      "test": "yarn workspace @akasify/hardhat test",
       "start": "yarn workspace @akasify/react-app start",
-      "compile": "yarn workspace @akasify/buidler compile",
-      "deploy": "yarn workspace @akasify/buidler deploy",
-      "watch": "yarn workspace @akasify/buidler watch",
-      "accounts": "yarn workspace @akasify/buidler accounts",
-      "balance": "yarn workspace @akasify/buidler balance",
-      "send": "yarn workspace @akasify/buidler send",
+      "compile": "yarn workspace @akasify/hardhat compile",
+      "deploy": "yarn workspace @akasify/hardhat deploy",
+      "watch": "yarn workspace @akasify/hardhat watch",
+      "accounts": "yarn workspace @akasify/hardhat accounts",
+      "balance": "yarn workspace @akasify/hardhat balance",
+      "send": "yarn workspace @akasify/hardhat send",
       "ipfs": "yarn workspace @akasify/react-app ipfs",
       "surge": "yarn workspace @akasify/react-app surge",
       "s3": "yarn workspace @akasify/react-app s3",
       "ship": "yarn workspace @akasify/react-app ship",
-      "generate": "cd packages/buidler && npx buidler generate",
-      "account": "cd packages/buidler && npx buidler account",
-      "flatten": "cd packages/buidler && npx buidler flatten",
-      "expose": "cd packages/buidler && npx buidler node"
+      "generate": "cd packages/hardhat && npx hardhat generate",
+      "account": "cd packages/hardhat && npx hardhat account",
+      "wallet": "cd packages/hardhat && npx hardhat wallet",
+      "fundedwallet": "cd packages/hardhat && npx hardhat fundedwallet",
+      "flatten": "cd packages/hardhat && npx hardhat flatten",
+      "graph-run-node": "cd docker/graph-node && docker-compose up",
+      "graph-remove-node": "cd docker/graph-node && docker-compose down",
+      "graph-prepare": "mustache packages/subgraph/config/config.json packages/subgraph/src/subgraph.template.yaml > packages/subgraph/subgraph.yaml",
+      "graph-codegen": "yarn workspace @akasify/subgraph graph codegen",
+      "graph-build": "yarn workspace @akasify/subgraph graph build",
+      "graph-create-local": "yarn workspace @akasify/subgraph graph create --node http://localhost:8020/ akasify/your-contract",
+      "graph-remove-local": "yarn workspace @akasify/subgraph graph remove --node http://localhost:8020/ akasify/your-contract",
+      "graph-deploy-local": "yarn workspace @akasify/subgraph graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 akasify/your-contract",
+      "graph-ship-local": "yarn graph-prepare && yarn graph-codegen && yarn graph-deploy-local",
+      "deploy-and-graph": "yarn deploy && yarn graph-ship-local"
     },
     "workspaces": {
       "packages": [
         "packages/*"
+      ],
+      "nohoist": [
+        "**/@graphprotocol/graph-ts",
+        "**/@graphprotocol/graph-ts/**"
       ]
     }
   }
