@@ -1,4 +1,4 @@
-# ZAct Server
+# Akasify Server
 
 This is a NodeJS Express server that manages the sensitive information for Akasify. We integrate Parcel SDK. The information published on the server is public and doesn't reveal by any means sensitive data of the opportunity.
 

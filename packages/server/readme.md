@@ -1,6 +1,6 @@
 # ZAct Server
 
-This is a NodeJS Express server that manages the acts created from the app by the creator. The information published on the server is public and doesn't reveal by any means the final data of the act.
+This is a NodeJS Express server that manages the opportunitie created from the app by the organizations. The information published on the server is public and doesn't reveal by any means sensitive data of the opportunity.
 
 ## Requirements
 
@@ -37,8 +37,8 @@ git commit -m "first commit"
 git push heroku master
 ```
 
-And ready; you will now have an URL for your new ZAct API!
+And ready; you will now have an URL for your new Akasify API!
 
 If you want a full explanation of the project, please visit:
 
-* [Documentation](https://nestorbonilla.gitbook.io/zact/)
+* [Documentation](https://nestorbonilla.gitbook.io/akasify/)
