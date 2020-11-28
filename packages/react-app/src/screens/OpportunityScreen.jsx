@@ -168,7 +168,7 @@ function OpportunityScreen ({
               >
                 <Meta
                   avatar={<Avatar src={item.avatar} />}
-                  title={item.name}
+                  title={ <NavLink to={ role == "organization" ? `/opportunityedit:${item.id}` : `/opportunity:${item.id}`}>{item.name}</NavLink>}
                   description={
                     <div className="opportunity-detail-card">
                       <Row justify="space-between">

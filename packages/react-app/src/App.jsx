@@ -15,6 +15,9 @@ import { parseEther, formatEther } from "@ethersproject/units";
 import { Hints, ExampleUI, Subgraph } from "./views"
 
 import { ReactComponent as Logo } from './assets/vectors/akasify_icon.svg';
+import CallbackScreen from './screens/CallbackScreen'
+import RegisterScreen from './screens/RegisterScreen'
+import RegisterSucessScreen from './screens/RegisterSucessScreen'
 import HomeScreen from './screens/HomeScreen'
 import OpportunityScreen from './screens/OpportunityScreen'
 import OpportunityDetailScreen from './screens/OpportunityDetailScreen'
@@ -41,7 +44,7 @@ import '../../../packages/react-app/src/i18n'
 import { INFURA_ID, ETHERSCAN_KEY } from "./constants";
 const { Footer } = Layout;
 
-const DEBUG = true
+const DEBUG = false
 
 // 🔭 block explorer URL
 const blockExplorer = "https://etherscan.io/" // for xdai: "https://blockscout.com/poa/xdai/"
@@ -95,6 +98,8 @@ function App(props) {
 
   // Get the role to manage access control
   const role = useContractReader(readContracts, 'AkasifyCoreContract', "getRole", [address]);
+  //console.log("user role: ", role);
+  //console.log("user role: ", role);
 
   // If you want to make 🔐 write transactions to your contracts, use the userProvider:
   const writeContracts = useContractLoader(userProvider)
@@ -139,12 +144,16 @@ function App(props) {
             />
             <Switch>
               <Route path='/opportunityedit:id' render={() => <OpportunityEditScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
-              <Route path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              <Route path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/organization:id' component={OpportunityDetailScreen} />
               <Route path='/organization' component={OrganizationScreen} />              
               <Route path='/profile' component={ProfileScreen} />
+              <Route path='/register' render={() => <RegisterScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              <Route path='/sucess' render={() => <RegisterSucessScreen />}/>
               <Route path='/admin' render={() => <AdminScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              {/* <Route exact path='/callback' render={() => <HomeScreen localProvider={localProvider} mainnetProvider={mainnetProvider} price={price} />}/> */}
+              <Route path={'/callback'} render={routeProps => <CallbackScreen {...routeProps} />} />
               <Route exact path='/' render={() => <HomeScreen localProvider={localProvider} mainnetProvider={mainnetProvider} price={price} />}/>
               
               <Footer className='footer'>© 2020 Created by Digital Bonds</Footer>
@@ -153,133 +162,6 @@ function App(props) {
         </BrowserRouter>
       </Fragment>
     </Suspense>
-    // <div className="App">
-
-    //   {/* ✏️ Edit the header and change the title to your project name */}
-    //   <Header />
-
-    //   <BrowserRouter>
-
-    //     <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
-    //       <Menu.Item key="/">
-    //         <Link onClick={()=>{setRoute("/")}} to="/">YourContract</Link>
-    //       </Menu.Item>
-    //       <Menu.Item key="/hints">
-    //         <Link onClick={()=>{setRoute("/hints")}} to="/hints">Hints</Link>
-    //       </Menu.Item>
-    //       <Menu.Item key="/exampleui">
-    //         <Link onClick={()=>{setRoute("/exampleui")}} to="/exampleui">ExampleUI</Link>
-    //       </Menu.Item>
-    //       <Menu.Item key="/subgraph">
-    //         <Link onClick={()=>{setRoute("/subgraph")}} to="/subgraph">Subgraph</Link>
-    //       </Menu.Item>
-    //     </Menu>
-
-    //     <Switch>
-    //       <Route exact path="/">
-    //         {/*
-    //             🎛 this scaffolding is full of commonly used components
-    //             this <Contract/> component will automatically parse your ABI
-    //             and give you a form to interact with it locally
-    //         */}
-    //         <Contract
-    //           name="YourContract"
-    //           signer={userProvider.getSigner()}
-    //           provider={localProvider}
-    //           address={address}
-    //           blockExplorer={blockExplorer}
-    //         />
-    //       </Route>
-    //       <Route path="/hints">
-    //         <Hints
-    //           address={address}
-    //           yourLocalBalance={yourLocalBalance}
-    //           mainnetProvider={mainnetProvider}
-    //           price={price}
-    //         />
-    //       </Route>
-    //       <Route path="/exampleui">
-    //         <ExampleUI
-    //           address={address}
-    //           userProvider={userProvider}
-    //           mainnetProvider={mainnetProvider}
-    //           localProvider={localProvider}
-    //           yourLocalBalance={yourLocalBalance}
-    //           price={price}
-    //           tx={tx}
-    //           writeContracts={writeContracts}
-    //           readContracts={readContracts}
-    //         />
-    //       </Route>
-    //       <Route path="/subgraph">
-    //         <Subgraph
-    //         subgraphUri={props.subgraphUri}
-    //         tx={tx}
-    //         writeContracts={writeContracts}
-    //         mainnetProvider={mainnetProvider}
-    //         />
-    //       </Route>
-    //     </Switch>
-    //   </BrowserRouter>
-
-
-    //   {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-    //   <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
-    //      <Account
-    //        address={address}
-    //        localProvider={localProvider}
-    //        userProvider={userProvider}
-    //        mainnetProvider={mainnetProvider}
-    //        price={price}
-    //        web3Modal={web3Modal}
-    //        loadWeb3Modal={loadWeb3Modal}
-    //        logoutOfWeb3Modal={logoutOfWeb3Modal}
-    //        blockExplorer={blockExplorer}
-    //      />
-    //   </div>
-
-    //   {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-    //    <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-    //      <Row align="middle" gutter={[4, 4]}>
-    //        <Col span={8}>
-    //          <Ramp price={price} address={address} />
-    //        </Col>
-
-    //        <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-    //          <GasGauge gasPrice={gasPrice} />
-    //        </Col>
-    //        <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-    //          <Button
-    //            onClick={() => {
-    //              window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-    //            }}
-    //            size="large"
-    //            shape="round"
-    //          >
-    //            <span style={{ marginRight: 8 }} role="img" aria-label="support">
-    //              💬
-    //            </span>
-    //            Support
-    //          </Button>
-    //        </Col>
-    //      </Row>
-
-    //      <Row align="middle" gutter={[4, 4]}>
-    //        <Col span={24}>
-    //          {
-
-    //            /*  if the local provider has a signer, let's show the faucet:  */
-    //            localProvider && localProvider.connection && localProvider.connection.url && localProvider.connection.url.indexOf("localhost")>=0 && !process.env.REACT_APP_PROVIDER && price > 1 ? (
-    //              <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider}/>
-    //            ) : (
-    //              ""
-    //            )
-    //          }
-    //        </Col>
-    //      </Row>
-    //    </div>
-
-    // </div>
   );
 }
 

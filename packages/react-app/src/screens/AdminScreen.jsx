@@ -35,7 +35,7 @@ function AdminScreen ({
     //console.log("🤗 opportunities:", opportunities);
 
     const organizations = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizations");
-    //console.log("🤗 organizations:", organizations);
+    console.log("🤗 organizations:", organizations);
 
     const beneficiaries = useContractReader(readContracts, 'AkasifyCoreContract', "getBeneficiaries");
     //console.log("🤗 beneficiaries:", beneficiaries);    
@@ -133,7 +133,7 @@ function AdminScreen ({
     ];
 
     const orgData = () => {    
-        //console.log('accessing org data');    
+        //console.log('accessing org data: ', organizations);    
         let data = [];
         if (organizations) {
             for (let i = 0; i < organizations[0].length; i++) {

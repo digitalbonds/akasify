@@ -26,10 +26,10 @@ contract AkasifyCoreContract {
         uint id;
         uint organizationId;
         string name;
-        string description;
-        uint creationDate;
+        string description;        
         uint preRequirementsDeadline;
         uint postRequirementsDeadline;
+        uint creationDate;
         uint lastUpdate;
         uint status;
         //1. draft
@@ -60,6 +60,8 @@ contract AkasifyCoreContract {
         uint nextPostRequirementId;
         uint nextPreAccomplishmentId;
         uint nextPostAccomplishmentId;
+        uint creationDate;
+        uint lastUpdate;
         uint status;
         //1. preRequirements started => beneficiary
         //2. preRequirements finalized => beneficiary
@@ -96,6 +98,7 @@ contract AkasifyCoreContract {
     address public admin;
 
     //events
+    event RegisterBeneficiary(address account);
     event OpportunityCreated(uint id, string name, string description);
     event OpportunityStatusUpdated(uint id, uint status);
     event ApplicationCreated(uint id, uint opportunityId);
@@ -130,7 +133,7 @@ contract AkasifyCoreContract {
             nextOrganizationId,
             name,
             account,
-            now,
+            block.timestamp,
             status
         );
         nextOrganizationId++;
@@ -181,20 +184,22 @@ contract AkasifyCoreContract {
         beneficiaries[nextBeneficiaryId] = Beneficiary(
             nextBeneficiaryId,
             account,
-            now,
+            block.timestamp,
             status
         );
         nextBeneficiaryId++;
+        emit RegisterBeneficiary(account);
     }
 
     function registerBeneficiary() public notAdmin() notOrganization() {
         beneficiaries[nextBeneficiaryId] = Beneficiary(
             nextBeneficiaryId,
             msg.sender,
-            now,
-            1
+            block.timestamp,
+            3
         );
         nextBeneficiaryId++;
+        emit RegisterBeneficiary(msg.sender);
     }
 
     function getBeneficiaries()
@@ -255,10 +260,10 @@ contract AkasifyCoreContract {
         opportunities[nextOpportunityId].organizationId = getOrganizationIdByAddress(msg.sender);
         opportunities[nextOpportunityId].name = name;
         opportunities[nextOpportunityId].description = description;        
-        opportunities[nextOpportunityId].creationDate = now;
+        opportunities[nextOpportunityId].creationDate = block.timestamp;
         opportunities[nextOpportunityId].preRequirementsDeadline = preRequirementsDeadline;
         opportunities[nextOpportunityId].postRequirementsDeadline = postRequirementsDeadline;
-        opportunities[nextOpportunityId].lastUpdate = now;
+        opportunities[nextOpportunityId].lastUpdate = block.timestamp;
         opportunities[nextOpportunityId].status = 1;
 
         //adding pre requirements
@@ -288,7 +293,8 @@ contract AkasifyCoreContract {
     }
 
     function createApplication(uint opportunityId)
-        public onlyBeneficiary() {
+        //public onlyBeneficiary() {
+        public {
 
         //validating opportunity is open for applications
         require (opportunities[opportunityId].status == 2, 'opportunity not open for applications');
@@ -300,12 +306,14 @@ contract AkasifyCoreContract {
         applications[nextApplicationId].nextPostRequirementId = 0;
         applications[nextApplicationId].nextPreAccomplishmentId = 0;
         applications[nextApplicationId].nextPostAccomplishmentId = 0;
+        applications[nextApplicationId].creationDate = block.timestamp;
+        applications[nextApplicationId].lastUpdate = block.timestamp;
         applications[nextApplicationId].status = 1;
 
         Accomplishment memory _accomplishment;
         _accomplishment.id = 0;
         _accomplishment.requirementId = 0;
-        _accomplishment.accomplishDate = now;
+        _accomplishment.accomplishDate = block.timestamp;
         _accomplishment.accomplishCategory = 1;     //started
         _accomplishment.accomplishValue = "";
         applications[nextApplicationId].preAccomplishments.push(_accomplishment);
@@ -348,7 +356,7 @@ contract AkasifyCoreContract {
     }*/
 
     function getOpportunities()
-        public view returns(uint[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory, uint[] memory) {
+        public view returns(uint[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory) {
 
         uint[] memory ids = new uint[](nextOpportunityId);
         string[] memory organizationNames = new string[](nextOpportunityId);
@@ -356,21 +364,25 @@ contract AkasifyCoreContract {
         string[] memory descriptions = new string[](nextOpportunityId);
         uint[] memory preRequirementDeadlines = new uint[](nextOpportunityId);
         uint[] memory postRequirementsDeadlines = new uint[](nextOpportunityId);
-        uint[] memory lastUpdates = new uint[](nextOpportunityId);
+        //uint[] memory creationDates = new uint[](nextOpportunityId);
+        //uint[] memory lastUpdates = new uint[](nextOpportunityId);
         uint[] memory status = new uint[](nextOpportunityId);
 
 
         for (uint i = 0; i < nextOpportunityId; i++) {
-            Opportunity memory _opportunity = opportunities[i];
+            Opportunity storage _opportunity = opportunities[i];
             ids[i] = _opportunity.id;
             organizationNames[i] = organizations[_opportunity.organizationId].name;
             names[i] = _opportunity.name;
             descriptions[i] = _opportunity.description;
             preRequirementDeadlines[i] = _opportunity.preRequirementsDeadline;
             postRequirementsDeadlines[i] = _opportunity.postRequirementsDeadline;
+            //creationDates[i] = _opportunity.creationDate;
+            //lastUpdates[i] = _opportunity.lastUpdate;
             status[i] = _opportunity.status;
         }
-        return (ids, organizationNames, names, descriptions, preRequirementDeadlines, postRequirementsDeadlines, lastUpdates, status);
+        //return (ids, organizationNames, names, descriptions, preRequirementDeadlines, postRequirementsDeadlines, creationDates, lastUpdates, status);
+        return (ids, organizationNames, names, descriptions, preRequirementDeadlines, postRequirementsDeadlines, status);
     }
 
     // function getOpportunityById(uint opportunityId)
@@ -386,7 +398,34 @@ contract AkasifyCoreContract {
 
         Opportunity storage _opportunity = opportunities[opportunityId];
 
-        return (_opportunity.organizationId, _opportunity.name, _opportunity.description, _opportunity.creationDate, _opportunity.preRequirementsDeadline, _opportunity.postRequirementsDeadline, _opportunity.lastUpdate, _opportunity.status);
+        return (_opportunity.organizationId, _opportunity.name, _opportunity.description, _opportunity.preRequirementsDeadline, _opportunity.postRequirementsDeadline, _opportunity.creationDate, _opportunity.lastUpdate, _opportunity.status);
+    }
+
+    function getApplication(uint opportunityId, address beneficiaryAddress) 
+        public view returns(uint, uint, uint, uint, uint, uint) {
+
+        uint _beneficiaryId = getBeneficiaryIdByAddress(beneficiaryAddress);
+        Application memory _application;
+
+        for (uint i = 0; i < nextApplicationId; i++) {
+            if (applications[i].opportunityId == opportunityId && applications[i].beneficiaryId == _beneficiaryId) {
+                _application = applications[i];
+            }
+        }
+
+        // uint id;
+        // uint opportunityId;
+        // uint beneficiaryId;
+        // uint nextPreRequirementId;
+        // uint nextPostRequirementId;
+        // uint nextPreAccomplishmentId;
+        // uint nextPostAccomplishmentId;
+        // uint creationDate;
+        // uint lastUpdate;
+        // uint status;
+        
+        return (_application.id, _application.opportunityId, _application.beneficiaryId, _application.creationDate, _application.lastUpdate, _application.status);
+        
     }
 
     // function getOpportunityById(uint opportunityId)
@@ -485,7 +524,7 @@ contract AkasifyCoreContract {
             Accomplishment(
                 applications[applicationId].nextPreAccomplishmentId,
                 applications[applicationId].nextPreRequirementId,
-                now,
+                block.timestamp,
                 2,                          //finished
                 accomplishmentValue
             )
@@ -505,7 +544,7 @@ contract AkasifyCoreContract {
                 Accomplishment(
                     applications[applicationId].nextPreAccomplishmentId,
                     applications[applicationId].nextPreRequirementId,
-                    now,
+                    block.timestamp,
                     1,                        //started
                     accomplishmentValue
                 )
@@ -530,7 +569,7 @@ contract AkasifyCoreContract {
             Accomplishment(
                 applications[applicationId].nextPostAccomplishmentId,
                 applications[applicationId].nextPostRequirementId,
-                now,
+                block.timestamp,
                 2,                          //finished
                 accomplishmentValue
             )
@@ -550,7 +589,7 @@ contract AkasifyCoreContract {
                 Accomplishment(
                     applications[applicationId].nextPostAccomplishmentId,
                     applications[applicationId].nextPostRequirementId,
-                    now,
+                    block.timestamp,
                     1,                        //started
                     accomplishmentValue
                 )
@@ -597,7 +636,7 @@ contract AkasifyCoreContract {
                         Accomplishment memory _accomplishment;
                         _accomplishment.id = 0;
                         _accomplishment.requirementId = 0;
-                        _accomplishment.accomplishDate = now;
+                        _accomplishment.accomplishDate = block.timestamp;
                         _accomplishment.accomplishCategory = 1;     //started
                         _accomplishment.accomplishValue = "";
                         applications[i].postAccomplishments.push(_accomplishment);
@@ -689,7 +728,7 @@ contract AkasifyCoreContract {
         uint _beneficiaryId = 0;
 
         for (uint i = 0; i < nextBeneficiaryId; i++) {
-            if (beneficiaries[i].account == account && beneficiaries[i].status == 3) {
+            if (beneficiaries[i].account == account) {
                 _beneficiaryId = beneficiaries[i].id;
             }
         }
@@ -702,7 +741,7 @@ contract AkasifyCoreContract {
 
         for (uint i = 0; i < nextBeneficiaryId; i++) {
             if (beneficiaries[i].account == account && beneficiaries[i].status == 3) {
-                _beneficiaryStatus = beneficiaries[i].id;
+                _beneficiaryStatus = beneficiaries[i].status;
             }
         }
 
@@ -727,11 +766,23 @@ contract AkasifyCoreContract {
         bool _isBeneficiary = false;
 
         for (uint i = 0; i < nextBeneficiaryId; i++) {
-            if (beneficiaries[i].account == account && beneficiaries[i].status == 3) {
+            if (beneficiaries[i].account == account) {
                 _isBeneficiary = true;
             }
         }
         return _isBeneficiary;
+    }
+
+    function isActiveBeneficiary(address account) public  view returns (bool) {
+
+        bool _isActiveBeneficiary = false;
+
+        for (uint i = 0; i < nextBeneficiaryId; i++) {
+            if (beneficiaries[i].account == account && beneficiaries[i].status == 3) {
+                _isActiveBeneficiary = true;
+            }
+        }
+        return _isActiveBeneficiary;
     }
 
     //modifiers
@@ -767,6 +818,12 @@ contract AkasifyCoreContract {
 
     modifier onlyBeneficiary() {
         bool _isBeneficiary = isBeneficiary(msg.sender);
+        require(_isBeneficiary, 'only beneficiary');
+        _;
+    }
+
+    modifier onlyActiveBeneficiary() {
+        bool _isBeneficiary = isActiveBeneficiary(msg.sender);
         require(_isBeneficiary, 'only active beneficiary');
         _;
     }

@@ -1,41 +1,6 @@
 {
   "_format": "hh-sol-cache-1",
   "files": {
-    "/Users/nestorbonilla/Documents/blockchain/scaffold-eth/packages/hardhat/contracts/YourContract.sol": {
-      "lastModificationDate": 1606331491526,
-      "sourceName": "contracts/YourContract.sol",
-      "solcConfig": {
-        "version": "0.6.7",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        ">=0.6.0 <0.7.0"
-      ],
-      "artifacts": [
-        "YourContract"
-      ]
-    },
     "/Users/nestorbonilla/Documents/blockchain/scaffold-eth/node_modules/hardhat/console.sol": {
       "lastModificationDate": 1606332009973,
       "sourceName": "hardhat/console.sol",
@@ -67,41 +32,6 @@
       ],
       "artifacts": [
         "console"
-      ]
-    },
-    "/Users/nestorbonilla/Documents/blockchain/akasify/packages/hardhat/contracts/AkasifyCoreContract.sol": {
-      "lastModificationDate": 1606365606680,
-      "sourceName": "contracts/AkasifyCoreContract.sol",
-      "solcConfig": {
-        "version": "0.6.7",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "hardhat/console.sol"
-      ],
-      "versionPragmas": [
-        ">=0.6.6"
-      ],
-      "artifacts": [
-        "AkasifyCoreContract"
       ]
     },
     "/Users/nestorbonilla/Documents/blockchain/akasify/node_modules/hardhat/console.sol": {
@@ -170,6 +100,41 @@
       ],
       "artifacts": [
         "YourContract"
+      ]
+    },
+    "/Users/nestorbonilla/Documents/blockchain/akasify/packages/hardhat/contracts/AkasifyCoreContract.sol": {
+      "lastModificationDate": 1606543448242,
+      "sourceName": "contracts/AkasifyCoreContract.sol",
+      "solcConfig": {
+        "version": "0.6.7",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        ">=0.6.6"
+      ],
+      "artifacts": [
+        "AkasifyCoreContract"
       ]
     }
   }

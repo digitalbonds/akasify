@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select, Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useParams, useHistory } from "react-router-dom";
@@ -7,8 +7,7 @@ import opportunityAvatar from '../assets/images/opportunity_avatar.png'
 import opportunityImage from '../assets/images/opportunity_detail.png'
 import moment from 'moment';
 import { useTranslation } from 'react-i18next'
-//import { BigNumber } from "bignumber.js"
-import { BigNumberish, BigNumber } from '@ethersproject/bignumber';
+import { BigNumber } from '@ethersproject/bignumber'
 const { Title, Paragraph, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -43,6 +42,8 @@ function OpportunityEditScreen ({
     const writeContracts = useContractLoader(userProvider)
 
     const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
+    console.log("opportunity data from sc: ", opportunity);
+    console.log("opportunity data from sc, status: ", opportunity && BigNumber.from(opportunity[7]).toNumber());
 
     //opportunity.organizationId;
     const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", id.replace(":",""));
@@ -53,6 +54,27 @@ function OpportunityEditScreen ({
         return "";
     }
 
+    // const oppNameData = () => {
+    //     //if (data && data.length > 0)            
+    //         //return data;
+    //     if (organization)
+    //         return opportunity[1];
+    //     return "";
+    // }
+
+    useEffect(() => {
+        if (opportunity) {
+            console.log("id param: ", id.replace(":",""));
+            console.log("id from sc: ", BigNumber.from(opportunity[0]).toNumber());            
+        }        
+        if (opportunity && oppCreationDate != BigNumber.from(opportunity[5]).toNumber()) {
+            setOppName(opportunity[1]);
+            setOppDescription(opportunity[2]);
+            setOppCreationDate(opportunity[5]);
+        }
+    }, [opportunity]);
+
+
     const [oppForm] = Form.useForm();
     const [preRequirementForm] = Form.useForm();
     const [postRequirementForm] = Form.useForm();
@@ -60,11 +82,11 @@ function OpportunityEditScreen ({
     const [oppId, setOppId] = useState(0);
     const [oppOrganizationId, setOppOrganizationId] = useState(0);
     const [oppOrganizationName, setOppOrganizationName] = useState("");
-    const [oppName, setOppName] = useState("");
+    const [oppName, setOppName] = useState();
     const [oppDescription, setOppDescription] = useState("");
-    const [oppCreationDate, setOppCreationDate] = useState(0);
     const [oppPreRequirementDeadline, setOppPreRequirementDeadline] = useState(0);
-    const [oppPosRequirementDeadline, setOppPostRequirementDeadline] = useState(0);
+    const [oppPosRequirementDeadline, setOppPostRequirementDeadline] = useState(0);    
+    const [oppCreationDate, setOppCreationDate] = useState(0);
     const [oppLastUpdate, setOppLastUpdate] = useState(0);
     const [oppStatus, setOppStatus] = useState(0);
 
@@ -134,10 +156,17 @@ function OpportunityEditScreen ({
 
     const postRequirementData = [];
 
-    const onOppFinish = () => {
+    const onOppCreate = () => {
         //console.log("transaction sent: ", oppName, ", ", oppDescription, ", ", oppPreRequirementDeadline, ", ", oppPosRequirementDeadline, ", [], [], [], [], [], []");
-        tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));
-        //history.push("/opportunity");
+        tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));        
+    };
+
+    const onOppUpdateStatus = (e) => {
+        e.preventDefault();
+        const newStatus = oppStatus + 2;
+        console.log("opportunity data id = ", oppId);
+        console.log("opportunity data status = ", parseInt(newStatus));
+        tx(writeContracts.AkasifyCoreContract.updateOpportunityStatus(oppId, parseInt(newStatus)));
     };
 
     const uploadButton = (
@@ -163,7 +192,7 @@ function OpportunityEditScreen ({
                 layout="vertical"
                 style={{marginTop: "12px"}}
                 form={oppForm}
-                onFinish={onOppFinish}
+                onFinish={onOppCreate}
             >
                 <Form.Item
                     name="opp-id"
@@ -288,7 +317,7 @@ function OpportunityEditScreen ({
                     <Input
                         disabled
                         placeholder={0}
-                        value={oppName}
+                        value={oppStatus}
                         onChange={e => setOppStatus(e.target.value)} />
                 </Form.Item>
                 <Form.Item
@@ -316,7 +345,7 @@ function OpportunityEditScreen ({
                             <Button type="primary" htmlType="submit">Save</Button>
                         </Col>
                         <Col span={1}>
-                            <Button type="primary" htmlType="submit">Next status</Button>
+                            <Button type="primary" onClick={(e) => {onOppUpdateStatus(e)}} htmlType="submit">Next status</Button>
                         </Col>
                     </Row>
                 </Form.Item>

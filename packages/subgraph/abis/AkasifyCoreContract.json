@@ -167,6 +167,19 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "RegisterBeneficiary",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "admin",
     "outputs": [
@@ -222,6 +235,16 @@
       {
         "internalType": "uint256",
         "name": "nextPostAccomplishmentId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "creationDate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastUpdate",
         "type": "uint256"
       },
       {
@@ -338,6 +361,55 @@
     "name": "createPreAccomplishment",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "opportunityId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "beneficiaryAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getApplication",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -497,11 +569,6 @@
         "internalType": "string[]",
         "name": "",
         "type": "string[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
       },
       {
         "internalType": "uint256[]",
@@ -903,6 +970,25 @@
         "type": "address"
       }
     ],
+    "name": "isActiveBeneficiary",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
     "name": "isBeneficiary",
     "outputs": [
       {
@@ -1017,17 +1103,17 @@
       },
       {
         "internalType": "uint256",
-        "name": "creationDate",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "preRequirementsDeadline",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
         "name": "postRequirementsDeadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "creationDate",
         "type": "uint256"
       },
       {
