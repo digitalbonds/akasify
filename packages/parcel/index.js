@@ -1,9 +1,7 @@
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const Parcel = require('@oasislabs/parcel-sdk');
 require('dotenv/config');
 let port = process.env.PORT || 3000;
 
@@ -19,7 +17,7 @@ app.use('/organizations', organizationsRoute);
 
 //ROUTES
 app.get('/', (req, res) => {
-    res.send('Welcome to Akasify App');  
+    res.send('Welcome to Akasify App');
 });
 
 app.listen(port, () => {
