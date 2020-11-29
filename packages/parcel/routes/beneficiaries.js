@@ -1,128 +1,99 @@
 const express = require('express');
 const router = express.Router();
+const Beneficiary = require('../models/Beneficiary');
 const Parcel = require('@oasislabs/parcel-sdk');
 
-//PARCEL CONFIGURATION
+//AKASIFY CONFIGURATION
 const configParams = {
     apiTokenSigner: {
       clientId: process.env.OASIS_CLIENT_ID,
       privateKey: process.env.OASIS_API_PRIVATE_KEY,
     },
 };
-const config = new Parcel.Config(configParams);
+const akasifyConfig = new Parcel.Config(configParams);
 
-router.post('/createStep', async (req, res) => {
+router.get('/createStep', async (req, res, next) => {
+
+    let datasetAddress = "";
+    const akasifyIdentityAddress = Parcel.Identity.addressFromToken(
+        await akasifyConfig.tokenProvider.getToken()
+    );
+    const akasifyIdentity = await Parcel.Identity.connect(akasifyIdentityAddress, akasifyConfig);
+    
     try {
 
-        const beneficiaryIdentityAddress = new Parcel.Address(req.body.beneficiaryAddress);
+        // 1. GET THE BENEFICIARY ADDRESS
+        const beneficiaryIdentityAddress = Parcel.Identity.addressFromToken(
+            req.body.token,
+        );
 
+        // 2. BUILDING STEP
         const step = new Beneficiary({
             id: req.body.id,
-            organizationId: req.body.organizationId,
-            clientId: req.body.clientId,
-            name: req.body.name,
-            content: req.body.content
+            beneficiaryId: req.body.beneficiaryId,
+            opportunityId: req.body.opportunityId,
+            applicationId: req.body.applicationId,
+            preRequirementId: req.body.preRequirementId,
+            value: req.body.value
         });
-        
-        // Find the identity address associated with the private key you supplied above.
-        const identityAddress = Parcel.Identity.addressFromToken(await config.tokenProvider.getToken());
-        
-        // Let's connect to the identity.
-        const identity = await Parcel.Identity.connect(identityAddress, config);
-        console.log(`Connected to identity at address ${identity.address.hex}`);
-        
-        // Now let's upload a dataset.
+
+        // // 3. BUILDING METADA
         const datasetMetadata = {
-            title: `step_${step.opportunityId}_${step.id}`,
+            title: "test_title", //`step_${step.beneficiaryId}_${step.opportunityId}_${step.applicationId}_${step.id}`,
             // A (fake) example metadata URL.
             //metadataUrl: 'for what?',
         };
-        const data = new TextEncoder().encode(JSON.stringify(step));
-        console.log('Uploading data for our user');
-        const dataset = await Parcel.Dataset.upload(data, datasetMetadata, identity, config);
 
+        // // 4. BUILDING DATA
+        const data = new TextEncoder().encode(JSON.stringify(step));
+
+        // // 5. UPLOADING DATA
         const dataset = await Parcel.Dataset.upload(
             data,
             datasetMetadata,
-            // The dataset is uploaded for Bob...
-            await Parcel.Identity.connect(beneficiaryIdentityAddress, config),
-            // ...with Alice's credentials being used to do the upload...
-            config,
+            // The dataset is uploaded for Beneficiary...
+            await Parcel.Identity.connect(beneficiaryIdentityAddress, akasifyConfig),
+            // ...with Akasify's credentials being used to do the upload...
+            akasifyConfig,
             {
-                // ...and Alice is flagged as the dataset's creator.
-                creator: identity,
+                // ...and Akasify is flagged as the dataset's creator.
+                creator: akasifyIdentity,
             },
         );
 
-        // `dataset.address.hex` is your dataset's unique ID.
-        console.log(`Created dataset with address ${dataset.address.hex} and uploaded to ${dataset.metadata.dataUrl}`);
+        // 6. RETURN ADDRESS
+        res.json(dataset.address);
 
-        res.json(dataset.address.hex);
     } catch (err) {
-        res.json(err);
-        return;
+        next(err);
     }
-    res.send('Beneficiaries');
 });
 
-// router.post('/', async (req, res) => {
-//     const beneficiary = new Beneficiary({
-//         name: req.body.name,
-//         email: req.body.email,
-//         password: req.body.password
-//     });
-//     try {
-//         const savedBeneficiary = await beneficiary.save();
-//         res.json(savedBeneficiary);    
-//     } catch (err) {
-//         res.json(err);
-//     }
-// });
+router.post('/getStep', async (req, res, next) => {
 
-// router.get('/:id', async (req, res) => {
-//     try {
-//         const beneficiary = await Beneficiary.findById(req.params.id);
-//         res.json(beneficiary);   
-//     } catch (err) {
-//         res.json(err);
-//     }
-// });
+    try {
 
-// router.delete('/:id', async (req, res) => {
-//     try {
-//         const beneficiary = await Beneficiary.remove({ _id: req.params.id });
-//         res.json(act);   
-//     } catch (err) {
-//         res.json(err);
-//     }
-// });
+        // 1. GET THE BENEFICIARY ADDRESS
+        const beneficiaryIdentityAddress = Parcel.Identity.addressFromToken(
+            req.body.token,
+        );
 
-// router.delete('/', async (req, res) => {
-//     try {
-//         const beneficiary = await Beneficiary.remove();
-//         res.json(beneficiary);   
-//     } catch (err) {
-//         res.json(err);
-//     }
-// });
+        const benficiaryConfig = new Parcel.Config({
+            apiAccessToken: req.body.token
+        });
 
-// router.put('/:id', async (req, res) => {
-//     try {
-//         const beneficiary = await Beneficiary.updateOne(
-//             { 
-//                 _id: req.params.id
-//             },
-//             {
-//                 $set: {
-//                     name: req.body.name,
-//                     email: req.body.email,
-//                     password: req.body.password
-//                 }
-//             });
-//         res.json(beneficiary);   
-//     } catch (err) {
-//         res.json(err);
-//     }
-// });
+        const benficiaryIdentity = await Parcel.Identity.connect(beneficiaryIdentityAddress, benficiaryConfig);
+
+        const datasetToDownload = await Parcel.Dataset.connect(req.body.address, benficiaryIdentity, akasifyConfig);
+
+        const secretDataStream = datasetToDownload.download();
+
+        // 6. RETURN CONTENT
+        res.json(secretDataStream);
+
+    } catch (err) {
+        next(err);
+    }
+});
 
 module.exports = router;

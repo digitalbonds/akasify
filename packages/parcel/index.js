@@ -13,10 +13,9 @@ app.use(bodyParser.json());
 
 //IMPORT ROUTES
 const beneficiariesRoute = require('./routes/beneficiaries');
-//const beneficiariesRoute = require('./routes/beneficiaries');
-
+const organizationsRoute = require('./routes/organizations');
 app.use('/beneficiaries', beneficiariesRoute);
-//app.use('/beneficiaries', beneficiariesRoute);
+app.use('/organizations', organizationsRoute);
 
 //ROUTES
 app.get('/', (req, res) => {
