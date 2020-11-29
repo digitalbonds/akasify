@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Redirect } from 'react-router-dom'
-import { withRouter } from 'react-router-dom'
+import { Redirect, useHistory, withRouter } from 'react-router-dom'
 import { Layout } from 'antd'
 import * as moment from 'moment'
 import { parcelConfig } from '../helpers/parcelConfig'
@@ -13,6 +12,7 @@ function CallbackScreen() {
 
     const [logIn, setLogIn] = useState(false);
     const oidcClient = new OidcClient(parcelConfig);
+    let history = useHistory();
 
     useEffect(() => {
         let callback = async () => {
@@ -25,22 +25,16 @@ function CallbackScreen() {
           const address = decoded.sub;
           localStorage.setItem('akasify-oasis-address', address);
           localStorage.setItem('akasify-oasis-token', access_token);
+
+          console.log("history, ", history);
+
           setLogIn(true);
         };
     
         callback();
       }, [logIn]);
 
-      return logIn ? <Redirect to={`/success`} /> : '';
-    /* return loggedIn ? (
-      <Layout className="site-layout">
-        <Content style={{ margin: '0 16px' }}>
-            <div>Hello</div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>Akasify ©{moment(new Date()).format('YYYY')} Created by Digital Bonds</Footer>
-      </Layout>
-    ) : <div>nop</div>
-    return loggedIn ? <Redirect to={`/myfiles`} /> : ''; */
+      return logIn ? <Redirect to={localStorage.getItem('akasify-oasis-previous')} /> : '';
 }
 
 export default withRouter(CallbackScreen);

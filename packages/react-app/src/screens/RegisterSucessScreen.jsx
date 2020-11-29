@@ -1,6 +1,7 @@
 import React from 'react';
 import { Layout, Typography, Button, Result, Steps } from 'antd';
 import { useTranslation } from 'react-i18next'
+import { NavLink } from 'react-router-dom';
 const { Paragraph, Text } = Typography;
 
 const { Step } = Steps;
@@ -16,10 +17,14 @@ function RegisterSucessScreen () {
                 title={t('beneficiary_register_sucess_title')}
                 subTitle={t('beneficiary_register_sucess_description')}
                 extra={[
-                    <Button type="primary" key="console">
-                        Return to Opportunity
-                    </Button>,
-                    <Button key="buy">Go Home</Button>,
+                    <NavLink to="/opportunity">
+                        <Button type="primary" key="console">
+                            Return to Opportunity
+                        </Button>
+                    </NavLink>,
+                    <NavLink to="/">
+                        <Button key="buy">Go Home</Button>
+                    </NavLink>,
                 ]}
             >
                 <div className="desc">

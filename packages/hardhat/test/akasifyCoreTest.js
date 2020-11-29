@@ -56,15 +56,15 @@ describe('Digital Bonds - Smart Contract Tests', function () {
       assert(opportunity.name == "opportunity name", 'opportunity not created');      
     });
 
-    it('Should not register an application if opportunity status is draft', async () => {
-      try {
-        await akasifyCore.connect(beneficiary).createApplication(0);
-      } catch (e) {
-        assert(e.message.includes('opportunity not open for applications'));
-        return;
-      }
-      assert(false);      
-    });
+    // it('Should not register an application if opportunity status is draft', async () => {
+    //   try {
+    //     await akasifyCore.connect(beneficiary).createApplication(0);
+    //   } catch (e) {
+    //     assert(e.message.includes('opportunity not open for applications'));
+    //     return;
+    //   }
+    //   assert(false);      
+    // });
 
     it('Should update application status to receiving applications', async () => {
       await akasifyCore.connect(organization).updateOpportunityStatus(0, 2);
@@ -74,8 +74,8 @@ describe('Digital Bonds - Smart Contract Tests', function () {
 
     it('Should register an application', async () => {
       const beneficiaryAddress = await beneficiary.getAddress();
-      const beneficiaryStatus = await akasifyCore.connect(beneficiary).isBeneficiary(beneficiaryAddress);
-      console.log("is beneficiary with status 3, ", beneficiaryStatus);
+      //const beneficiaryStatus = await akasifyCore.connect(beneficiary).isBeneficiary(beneficiaryAddress);
+      //console.log("is beneficiary with status 3, ", beneficiaryStatus);
 
       await akasifyCore.connect(beneficiary).createApplication(0);
       const application = await akasifyCore.applications(0);
@@ -84,7 +84,13 @@ describe('Digital Bonds - Smart Contract Tests', function () {
       assert(preAccomplishment.accomplishCategory == 1, 'pre accomplishment not created');
     });
 
-    /* it('Should register a pre accomplishment', async () => {
+    it('Applicatioin should have one pre accomplishments', async () => {
+      const preAccomplishments = await akasifyCore.getPreAccomplishmentsByApplicationId(0);
+      console.log("pre accomplishments: ", preAccomplishments);
+      assert(preAccomplishments[0].length == 1, 'pre accomplishment not created');
+    });
+
+    it('Should register a pre accomplishment', async () => {
       await akasifyCore.connect(beneficiary).createPreAccomplishment(0, "");
       const preAccomplishment = await akasifyCore.getPreAccomplishment(0, 1);
       const autoPreAccomplishment = await akasifyCore.getPreAccomplishment(0, 2);
@@ -92,6 +98,12 @@ describe('Digital Bonds - Smart Contract Tests', function () {
       assert(autoPreAccomplishment.requirementId == 1 && autoPreAccomplishment.accomplishCategory == 1, 'pre accomplishment not created');
     });
 
+    it('Applicatioin should have three pre accomplishments', async () => {
+      const preAccomplishments = await akasifyCore.getPreAccomplishmentsByApplicationId(0);
+      console.log("pre accomplishments: ", preAccomplishments);
+      assert(preAccomplishments[0].length == 3, 'pre accomplishment not created');
+    });
+/* 
     it('Should finish application preAccomplishments', async () => {
       await akasifyCore.connect(beneficiary).createPreAccomplishment(0, "");
       const preAccomplishment = await akasifyCore.getPreAccomplishment(0, 3);

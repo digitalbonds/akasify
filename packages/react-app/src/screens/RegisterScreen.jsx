@@ -1,7 +1,10 @@
 import React from 'react';
+import { useHistory } from "react-router-dom";
 import { Row, Col, Layout, Typography, Form, Input, Button } from 'antd';
 import { useContractLoader, useEventListener } from "../hooks";
+import { useEffect } from 'react';
 const { Title, Paragraph, Text } = Typography;
+
 
 function RegisterScreen ({
   address,
@@ -10,21 +13,24 @@ function RegisterScreen ({
   tx
 }) {
 
+    let history = useHistory();
     const readContracts = useContractLoader(localProvider);
     const writeContracts = useContractLoader(userProvider);
 
     //📟 Listen for broadcast events
   const setBeneficiaryEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterBeneficiary", localProvider, 1);
-  console.log("📟 setBeneficiary events:", setBeneficiaryEvents);
 
     const [benForm] = Form.useForm();
-    //const [benAccount, setBenAccount] = useState(address);
-
-    console.log("📟 beneficiary address: ", address);
 
     const onBenFinish = () => {
         tx(writeContracts['AkasifyCoreContract'].registerBeneficiary());
     };
+
+    useEffect(() => {
+        if (setBeneficiaryEvents && setBeneficiaryEvents[0] && setBeneficiaryEvents[0].account == address) {
+            history.push("/sucess");
+        }
+    }, [setBeneficiaryEvents]);
 
   return (
     <Layout className="site-layout">

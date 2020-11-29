@@ -41,12 +41,13 @@ contract AkasifyCoreContract {
         //7. postRequirements concluded
         uint nextPreRequirementId;
         uint nextPostRequirementId;
-        mapping(uint => Requirement) preRequirements;
-        mapping(uint => Requirement) postRequirements;
+        Requirement[] preRequirements;
+        Requirement[] postRequirements;
     }
 
     struct Requirement {
         uint id;
+        uint opportunityId;
         uint requirementType;           //simple, value_required, automatic_transfer
         uint transferValue;             //zero by default, when stepType is automatic_transfer the value need to be higher than zero
         string name;
@@ -103,8 +104,8 @@ contract AkasifyCoreContract {
     event OpportunityStatusUpdated(uint id, uint status);
     event ApplicationCreated(uint id, uint opportunityId);
     event ApplicationStatusUpdated(uint id, uint status);
-    event ApplicationPreAccomplishmentCreated(uint id, uint requirementId, uint accomplishDate, uint accomplishCategory, uint accomplishValue);
-    event ApplicationPostAccomplishmentCreated(uint id, uint requirementId, uint accomplishDate, uint accomplishCategory, uint accomplishValue);
+    event ApplicationPreAccomplishmentCreated(uint id, uint requirementId, uint applicationId, uint opportunityId);
+    event ApplicationPostAccomplishmentCreated(uint id, uint requirementId, uint applicationId, uint opportunityId);
 
     constructor(address _admin) public {
         admin = _admin;
@@ -268,22 +269,28 @@ contract AkasifyCoreContract {
 
         //adding pre requirements
         for(uint i = 0; i < preRequirementTypes.length; i++) {
-            opportunities[nextOpportunityId].preRequirements[opportunities[nextOpportunityId].nextPreRequirementId] = Requirement(
-                opportunities[nextOpportunityId].nextPreRequirementId,
-                preRequirementTypes[i],
-                preRequirementValues[i],
-                preRequirementNames[i]
+            opportunities[nextOpportunityId].preRequirements.push(
+                Requirement(
+                    opportunities[nextOpportunityId].nextPreRequirementId,
+                    nextOpportunityId,
+                    preRequirementTypes[i],
+                    preRequirementValues[i],
+                    preRequirementNames[i]
+                )
             );
             opportunities[nextOpportunityId].nextPreRequirementId++;
         }
 
         //adding post requirements
         for(uint i = 0; i < postRequirementTypes.length; i++) {
-            opportunities[nextOpportunityId].postRequirements[opportunities[nextOpportunityId].nextPostRequirementId] = Requirement(
-                opportunities[nextOpportunityId].nextPostRequirementId,
-                postRequirementTypes[i],
-                postRequirementValues[i],
-                postRequirementNames[i]
+            opportunities[nextOpportunityId].postRequirements.push(
+                 Requirement(
+                    opportunities[nextOpportunityId].nextPostRequirementId,
+                    nextOpportunityId,
+                    postRequirementTypes[i],
+                    postRequirementValues[i],
+                    postRequirementNames[i]
+                )
             );
             opportunities[nextOpportunityId].nextPostRequirementId++;
         }
@@ -298,6 +305,8 @@ contract AkasifyCoreContract {
 
         //validating opportunity is open for applications
         require (opportunities[opportunityId].status == 2, 'opportunity not open for applications');
+
+        //validating there's no other application for this opportunity for this beneficiary
 
         applications[nextApplicationId].id = nextApplicationId;
         applications[nextApplicationId].opportunityId = opportunityId;
@@ -325,35 +334,52 @@ contract AkasifyCoreContract {
         nextApplicationId++;
     }
 
-    /*function getOpportunities()
-        public view returns(uint[] memory, uint[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory, uint[] memory, uint[] memory) {
+    function createPreRequirement(
+        uint opportunityId,
+        uint requirementType,
+        uint transferValue,
+        string memory name
+    ) public onlyOrganization() {    
+                
+        require(opportunities[opportunityId].status == 1, "opportunity is not in draft mode");
 
-        uint[] memory ids = new uint[](nextOpportunityId);
-        uint[] memory organizationIds = new uint[](nextOpportunityId);
-        string[] memory organizationNames = new string[](nextOpportunityId);
-        string[] memory names = new string[](nextOpportunityId);
-        string[] memory descriptions = new string[](nextOpportunityId);
-        uint[] memory creationDates = new uint[](nextOpportunityId);
-        uint[] memory preRequirementsDeadlines = new uint[](nextOpportunityId);
-        uint[] memory postRequirementsDeadlines = new uint[](nextOpportunityId);
-        uint[] memory lastUpdates = new uint[](nextOpportunityId);
-        uint[] memory status = new uint[](nextOpportunityId);
+        //adding a new pre requirement in the opportunity
+        opportunities[opportunityId].preRequirements.push(
+            Requirement(
+                opportunities[opportunityId].nextPreRequirementId,
+                opportunityId,
+                requirementType,
+                transferValue,
+                name
+            )
+        );
 
-        for (uint i = 0; i < nextOpportunityId; i++) {
-            Opportunity memory _opportunity = opportunities[i];
-            ids[i] = _opportunity.id;
-            organizationIds[i] = _opportunity.organizationId;
-            organizationNames[i] = organizations[_opportunity.organizationId].name;
-            names[i] = _opportunity.name;
-            descriptions[i] = _opportunity.description;
-            creationDates[i] = _opportunity.creationDate;
-            preRequirementsDeadlines[i] = _opportunity.preRequirementsDeadline;
-            postRequirementsDeadlines[i] = _opportunity.postRequirementsDeadline;
-            lastUpdates[i] = _opportunity.lastUpdate;
-            status[i] = _opportunity.status;
-        }
-        return (ids, organizationIds, organizationNames, names, descriptions, creationDates, preRequirementsDeadlines, postRequirementsDeadlines, lastUpdates, status);
-    }*/
+        opportunities[opportunityId].nextPreRequirementId++;
+    }
+
+    function createPostRequirement(
+        uint opportunityId,
+        uint requirementType,
+        uint transferValue,
+        string memory name
+    ) public onlyOrganization() {    
+                
+        require(opportunities[opportunityId].status == 1, "opportunity is not in draft mode");
+
+        //adding a new post requirement in the opportunity
+        opportunities[opportunityId].postRequirements.push(
+            Requirement(
+                opportunities[opportunityId].nextPostRequirementId,
+                opportunityId,
+                requirementType,
+                transferValue,
+                name
+            )
+        );
+
+        opportunities[opportunityId].nextPostRequirementId++;
+
+    }
 
     function getOpportunities()
         public view returns(uint[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory) {
@@ -385,14 +411,6 @@ contract AkasifyCoreContract {
         return (ids, organizationNames, names, descriptions, preRequirementDeadlines, postRequirementsDeadlines, status);
     }
 
-    // function getOpportunityById(uint opportunityId)
-    //     public view returns(Opportunity memory _opportunity) {
-
-    //     Opportunity memory _opportunity = opportunities[opportunityId];
-
-    //     return _opportunity;
-    // }
-
     function getOpportunityById(uint opportunityId)
         public view returns(uint, string memory, string memory, uint, uint, uint, uint, uint) {
 
@@ -412,55 +430,10 @@ contract AkasifyCoreContract {
                 _application = applications[i];
             }
         }
-
-        // uint id;
-        // uint opportunityId;
-        // uint beneficiaryId;
-        // uint nextPreRequirementId;
-        // uint nextPostRequirementId;
-        // uint nextPreAccomplishmentId;
-        // uint nextPostAccomplishmentId;
-        // uint creationDate;
-        // uint lastUpdate;
-        // uint status;
         
         return (_application.id, _application.opportunityId, _application.beneficiaryId, _application.creationDate, _application.lastUpdate, _application.status);
-        
+
     }
-
-    // function getOpportunityById(uint opportunityId)
-    //     public view returns(uint, string memory, string memory, uint, uint, uint, uint, uint, uint[] memory, uint[] memory, uint[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory, string[] memory) {
-
-    //     Opportunity storage _opportunity = opportunities[opportunityId];
-
-    //     uint[] memory preRequirementIds = new uint[](_opportunity.nextPreRequirementId);
-    //     uint[] memory preRequirementTypes = new uint[](_opportunity.nextPreRequirementId);
-    //     uint[] memory preRequirementValues = new uint[](_opportunity.nextPreRequirementId);
-    //     string[] memory preRequirementNames = new string[](_opportunity.nextPreRequirementId);
-
-    //     uint[] memory posRequirementIds = new uint[](_opportunity.nextPostRequirementId);
-    //     uint[] memory posRequirementTypes = new uint[](_opportunity.nextPostRequirementId);
-    //     uint[] memory posRequirementValues = new uint[](_opportunity.nextPostRequirementId);
-    //     string[] memory posRequirementNames = new string[](_opportunity.nextPostRequirementId);
-
-    //     for (uint i = 0; i < _opportunity.nextPreRequirementId; i++) {
-    //         Requirement memory _requirement = _opportunity.preRequirements[i];
-    //         preRequirementIds[i] = _requirement.id;
-    //         preRequirementTypes[i] = _requirement.requirementType;
-    //         preRequirementValues[i] = _requirement.transferValue;
-    //         preRequirementNames[i] = _requirement.name;
-    //     }
-
-    //     for (uint i = 0; i < _opportunity.nextPostRequirementId; i++) {    
-    //         Requirement memory _requirement = _opportunity.postRequirements[i];        
-    //         posRequirementIds[i] = _requirement.id;
-    //         posRequirementTypes[i] = _requirement.requirementType;
-    //         posRequirementValues[i] = _requirement.transferValue;
-    //         posRequirementNames[i] = _requirement.name;
-    //     }
-
-    //     return (_opportunity.organizationId, _opportunity.name, _opportunity.description, _opportunity.creationDate, _opportunity.preRequirementsDeadline, _opportunity.postRequirementsDeadline, _opportunity.lastUpdate, _opportunity.status, preRequirementIds, preRequirementTypes, preRequirementValues, preRequirementNames, posRequirementIds, posRequirementTypes, posRequirementValues, posRequirementNames);
-    // }
 
     function getPreRequirementsByOpportunityId(uint opportunityId) 
         public view returns(uint[] memory, uint[] memory, uint[] memory, string[] memory) {
@@ -501,10 +474,53 @@ contract AkasifyCoreContract {
         return (postRequirementIds, postRequirementTypes, postRequirementValues, postRequirementNames);
     }
 
+    function getPreAccomplishmentsByApplicationId(uint applicationId)
+        public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, string[] memory) {
+
+        Application storage _application = applications[applicationId];
+        uint[] memory preAccomplishmentIds = new uint[](_application.nextPreAccomplishmentId);
+        uint[] memory preRequirementIds = new uint[](_application.nextPreAccomplishmentId);
+        uint[] memory preAccomplishDates = new uint[](_application.nextPreAccomplishmentId);
+        uint[] memory preAccomplishCategories = new uint[](_application.nextPreAccomplishmentId);
+        string[] memory preAccomplishValues = new string[](_application.nextPreAccomplishmentId);
+        
+        for (uint i = 0; i < _application.nextPreAccomplishmentId; i++) {
+            Accomplishment memory _accomplishment = _application.preAccomplishments[i];
+            preAccomplishmentIds[i] = _accomplishment.id;
+            preRequirementIds[i] = _accomplishment.requirementId;
+            preAccomplishDates[i] = _accomplishment.accomplishDate;
+            preAccomplishCategories[i] = _accomplishment.accomplishCategory;
+            preAccomplishValues[i] = _accomplishment.accomplishValue;
+        }
+        return (preAccomplishmentIds, preRequirementIds, preAccomplishDates, preAccomplishCategories, preAccomplishValues);
+    }
+
     function getPreAccomplishment(uint applicationId, uint preAccomplishmentId) 
         public view returns(Accomplishment memory _accomplishment) {
         Accomplishment memory accomplishment = applications[applicationId].preAccomplishments[preAccomplishmentId];
         return accomplishment;
+    }
+
+    function getPostAccomplishments(uint applicationId)
+        public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, string[] memory) {
+
+        Application storage _application = applications[applicationId];
+        uint[] memory postAccomplishmentIds = new uint[](_application.nextPostRequirementId);
+        uint[] memory postRequirementIds = new uint[](_application.nextPostRequirementId);
+        uint[] memory postAccomplishDates = new uint[](_application.nextPostRequirementId);
+        uint[] memory postAccomplishCategories = new uint[](_application.nextPostRequirementId);
+        string[] memory postAccomplishValues = new string[](_application.nextPostRequirementId);
+        
+
+        for (uint i = 0; i < _application.nextPostAccomplishmentId; i++) {
+            Accomplishment memory _accomplishment = _application.postAccomplishments[i];
+            postAccomplishmentIds[i] = _accomplishment.id;
+            postRequirementIds[i] = _accomplishment.requirementId;
+            postAccomplishDates[i] = _accomplishment.accomplishDate;
+            postAccomplishCategories[i] = _accomplishment.accomplishCategory;
+            postAccomplishValues[i] = _accomplishment.accomplishValue;
+        }
+        return (postAccomplishmentIds, postRequirementIds, postAccomplishDates, postAccomplishCategories, postAccomplishValues);
     }
 
     function getPostAccomplishment(uint applicationId, uint postAccomplishmentId) 
@@ -519,6 +535,7 @@ contract AkasifyCoreContract {
     ) public onlyBeneficiary() {    
         
         require(applications[applicationId].status == 1, "application has not started to receive preAccomplishments");
+        
         //adding a new accomplishment in the current application
         applications[applicationId].preAccomplishments.push(
             Accomplishment(
@@ -652,6 +669,7 @@ contract AkasifyCoreContract {
             require(opportunities[opportunityId].status == 6, "opportunity must be finalized for close postRequirement reception");
         }
 
+        opportunities[opportunityId].lastUpdate = block.timestamp;
         opportunities[opportunityId].status = status;
 
         //1. draft

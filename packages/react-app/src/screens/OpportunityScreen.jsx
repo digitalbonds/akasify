@@ -35,6 +35,7 @@ function OpportunityScreen ({
         for (let i = 0; i < opportunities[0].length; i++) {
             data.push({
                 id: BigNumber.from(opportunities[0][i]).toNumber(),
+                key: BigNumber.from(opportunities[0][i]).toNumber(),
                 organizationName: opportunities[1][i],
                 name: opportunities[2][i],
                 description: opportunities[3][i],                
@@ -46,7 +47,7 @@ function OpportunityScreen ({
             });
         }   
     }
-    console.log('accessing opportunities ', data);     
+    //console.log('accessing opportunities ', data);     
     return data;
 }
 
@@ -187,7 +188,7 @@ function OpportunityScreen ({
                             <TagOutlined />
                           </Tooltip>
                         </Col>
-                        <Col span={22}>{tags(item.tags)}</Col>
+                        {/* <Col span={22}>{tags(item.tags)}</Col> */}
                       </Row>
                       <Row justify="space-between">
                         <Col span={24}>{item.description.substring(0, length)}</Col>

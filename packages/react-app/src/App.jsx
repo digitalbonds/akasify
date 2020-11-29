@@ -183,6 +183,12 @@ const web3Modal = new Web3Modal({
 });
 
 const logoutOfWeb3Modal = async () => {
+
+  // OASIS PARCEL
+  localStorage.setItem('akasify-oasis-previous', '');
+  localStorage.setItem('akasify-oasis-address', '');
+  localStorage.setItem('akasify-oasis-token', '');
+
   await web3Modal.clearCachedProvider();
   setTimeout(() => {
     window.location.reload();
