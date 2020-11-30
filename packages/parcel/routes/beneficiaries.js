@@ -12,9 +12,8 @@ const configParams = {
 };
 const akasifyConfig = new Parcel.Config(configParams);
 
-router.get('/createStep', async (req, res, next) => {
+router.post('/createStep', async (req, res, next) => {
 
-    let datasetAddress = "";
     const akasifyIdentityAddress = Parcel.Identity.addressFromToken(
         await akasifyConfig.tokenProvider.getToken()
     );
@@ -29,11 +28,8 @@ router.get('/createStep', async (req, res, next) => {
 
         // 2. BUILDING STEP
         const step = new Beneficiary({
-            id: req.body.id,
-            beneficiaryId: req.body.beneficiaryId,
-            opportunityId: req.body.opportunityId,
             applicationId: req.body.applicationId,
-            preRequirementId: req.body.preRequirementId,
+            oppportunityId: req.body.oppportunityId,
             value: req.body.value
         });
 

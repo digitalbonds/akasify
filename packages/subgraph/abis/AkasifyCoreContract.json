@@ -26,7 +26,7 @@
         "type": "uint256"
       }
     ],
-    "name": "ApplicationCreated",
+    "name": "RegisterApplication",
     "type": "event"
   },
   {
@@ -57,7 +57,7 @@
         "type": "uint256"
       }
     ],
-    "name": "ApplicationPostAccomplishmentCreated",
+    "name": "RegisterApplicationPostAccomplishment",
     "type": "event"
   },
   {
@@ -88,7 +88,7 @@
         "type": "uint256"
       }
     ],
-    "name": "ApplicationPreAccomplishmentCreated",
+    "name": "RegisterApplicationPreAccomplishment",
     "type": "event"
   },
   {
@@ -96,18 +96,12 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "status",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
       }
     ],
-    "name": "ApplicationStatusUpdated",
+    "name": "RegisterBeneficiary",
     "type": "event"
   },
   {
@@ -132,7 +126,7 @@
         "type": "string"
       }
     ],
-    "name": "OpportunityCreated",
+    "name": "RegisterOpportunity",
     "type": "event"
   },
   {
@@ -151,7 +145,7 @@
         "type": "uint256"
       }
     ],
-    "name": "OpportunityStatusUpdated",
+    "name": "UpdateApplicationStatus",
     "type": "event"
   },
   {
@@ -159,12 +153,18 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "status",
+        "type": "uint256"
       }
     ],
-    "name": "RegisterBeneficiary",
+    "name": "UpdateOpportunityStatus",
     "type": "event"
   },
   {

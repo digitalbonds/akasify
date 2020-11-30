@@ -59,15 +59,20 @@ function OpportunityDetailScreen({
   // MODAL
   const [applicationModalVisible, setApplicationModalVisible] = useState(false);  
   const [oasisModalVisible, setOasisModalVisible] = useState(false);
-  const [preRequirementModalVisible, setPreRequirementModalVisible] = useState(false);
-  
+  const [preAccomplishmentModalStep, setPreAccomplishmentModalStep] = useState(0);
+  const [preAccomplishmentModalVisible, setPreAccomplishmentModalVisible] = useState(false);
 
+  // SMART CONTRACT HOOKS
   const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
   const application = useContractReader(readContracts, 'AkasifyCoreContract', "getApplication", [id.replace(":",""), address]);
   const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
   //const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
   const preAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPreAccomplishmentsByApplicationId', [appId]);
-  //const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);
+  //const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);  
+
+  // SMART CONTRACT BROADCAST
+  const setApplicationCreateEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterApplication", localProvider, 1);
+  const setPreAccomplishmentCreateEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterApplicationPreAccomplishment", localProvider, 1);
 
   useEffect(() => {
     if (application && application.length > 0 && appLastUpdate != BigNumber.from(application[4]).toNumber()) {
@@ -79,14 +84,67 @@ function OpportunityDetailScreen({
         setAppStatus(BigNumber.from(application[5]).toNumber());        
     }
   }, [application]);
+  
+  useEffect(() => {
+    if (setApplicationCreateEvents && setApplicationCreateEvents[0] && setApplicationCreateEvents[0].id > 0) {
+        setApplicationModalVisible(false);
+    }
+  }, [setApplicationCreateEvents]);
+
+  useEffect(() => {
+    if (setPreAccomplishmentCreateEvents && setPreAccomplishmentCreateEvents[0] && setPreAccomplishmentCreateEvents[0].id > 0) {
+        setPreAccomplishmentModalStep(preAccomplishmentModalStep + 1);
+    }
+  }, [setPreAccomplishmentCreateEvents]);
 
   // OASIS PARCEL
   const oidcClient = new OidcClient(parcelConfig);
+
   const obtainIdToken = async () => {
     localStorage.setItem('akasify-oasis-previous', history.location.pathname);
     const request = await oidcClient.createSigninRequest();
     window.location.assign(request.url);
   };
+
+  const currentPreRequirement = () => {
+    if (preAccomplishments && preAccomplishments.length > 0) {
+      //console.log("step 2, ", preAccomplishments);
+      // if (BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber()) {
+      //   console.log("step 3");
+      //   if (BigNumber.from(preAccomplishments[3][preAccomplishments[3].length - 1]).toNumber() == 1) {
+      //     // PRE REQUIREMENT INITIATED
+      //     return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber();
+      //   } else {
+      //     // PRE REQUIREMENT FINALIZED
+      //     return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber() + 1;
+      //   }
+      // }
+    }
+    return 0;
+  }
+
+  const uploadData = async () => {
+    console.log("api token: ", localStorage.getItem('akasify-oasis-token'));
+    const response = await fetch('http://localhost:5000/beneficiaries/createStep', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        applicationId: appId,
+        opportunityId: appOpportunityId,
+        value: preAcValue,
+        token: localStorage.getItem('akasify-oasis-token')
+      })
+    }).then((res) => res.json());
+    createPreAccomplishment(response);
+  }
+
+  const createPreAccomplishment = async (datasetAddress) => {
+    setPreAccomplishmentModalStep(preAccomplishmentModalStep + 1);
+    // CREATING PRE ACCOMPLISHMENT WITH CONTENT ADDRESS FROM OASIS
+    tx(writeContracts.AkasifyCoreContract.createPreAccomplishment(appId, datasetAddress));
+  }
 
   // FORM ACTIONS
   const onApplicationCreate =() => {
@@ -94,14 +152,13 @@ function OpportunityDetailScreen({
   }
   const onPreAccomplishmentCreate = () => {
     if (localStorage.getItem('akasify-oasis-address') == "" && localStorage.getItem('akasify-oasis-token') == "") {
-      console.log("calling oasis modal");
       setOasisModalVisible(true);
     } else {
-      // OASIS SERVER CALL
-      setPreAcValue("");
+      setPreAccomplishmentModalStep(0);
+      setPreAccomplishmentModalVisible(true);
 
-      // CREATING PRE ACCOMPLISHMENT WITH CONTENT ADDRESS FROM OASIS
-      tx(writeContracts.AkasifyCoreContract.createPreAccomplishment(appId, preAcValue));
+      // UPLOADING DATA TO OASIS
+      uploadData();
     }
 };
 
@@ -159,19 +216,15 @@ function OpportunityDetailScreen({
   
   const preAccomplishmentData = () => {
     let data = [];
-
-    //test to get data from oasis address
-    
-    //preAccomplishmentIds, preRequirementIds, preAccomplishDates, preAccomplishCategories, preAccomplishValues
     if (preAccomplishments) {
         for (let i = 0; i < preAccomplishments[0].length; i++) {
             data.push(
                 {
                     id: BigNumber.from(preAccomplishments[0][i]).toNumber(),
                     key: BigNumber.from(preAccomplishments[0][i]).toNumber(),
-                    type: "some",//BigNumber.from(preAccomplishments[2][i]).toNumber(),
-                    value: "hey",//BigNumber.from(preAccomplishments[3][i]).toNumber(),
-                    name: "yeap"//preAccomplishments[3][i]
+                    tags: BigNumber.from(preAccomplishments[3][i]).toNumber(),
+                    value: preAccomplishments[4][i],
+                    name: preAccomplishments[4][i]
                 }
             )
         }
@@ -252,9 +305,9 @@ function OpportunityDetailScreen({
         <TabPane tab="Pre requirements" key={1}>
           <Row>
             <Col span={5}>              
-              <Steps direction="vertical" current={1}>
+              <Steps direction="vertical" current={currentPreRequirement()}>
                 {preRequirementData().map(preRequirement => {
-                  return (<Step title={preRequirement.name} />)                  
+                  return (<Step title={preRequirement.name} />)
                 })}
               </Steps>
             </Col>
@@ -330,16 +383,16 @@ function OpportunityDetailScreen({
         <Paragraph>To set up or Login your Oasis account, click Ok</Paragraph>
       </Modal>
       <Modal
-        title="Pre Requirement"
-        visible={preRequirementModalVisible}
-        onOk={onPreAccomplishmentCreate}
-        onCancel={ () => { setPreRequirementModalVisible(false) } }
+        title="Pre Accomplishment"
+        visible={preAccomplishmentModalVisible}
+        onOk={ () => { setPreAccomplishmentModalVisible(false) } }
       >
-        <Paragraph>
-          Here at Akasify, your privacy is very important to us. We've partned with
-          Oasis Labs so you can own your application sensitive data from our app.
-        </Paragraph>
         <Paragraph>To set up or Login your Oasis account, click Ok</Paragraph>
+        <Steps direction="horizontal" current={preAccomplishmentModalStep}>
+          <Step title={"Encrypting your information"} />
+          <Step title={"Creating pre accomplishment on the blockchain"} />
+          <Step title={"Completed"} />
+        </Steps>
       </Modal>
     </Layout>
   )

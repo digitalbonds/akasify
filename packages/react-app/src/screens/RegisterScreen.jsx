@@ -17,7 +17,7 @@ function RegisterScreen ({
     const readContracts = useContractLoader(localProvider);
     const writeContracts = useContractLoader(userProvider);
 
-    //📟 Listen for broadcast events
+    //📟 Listen for broadcast beneficiary events
   const setBeneficiaryEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterBeneficiary", localProvider, 1);
 
     const [benForm] = Form.useForm();

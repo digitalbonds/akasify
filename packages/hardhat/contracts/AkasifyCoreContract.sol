@@ -100,12 +100,12 @@ contract AkasifyCoreContract {
 
     //events
     event RegisterBeneficiary(address account);
-    event OpportunityCreated(uint id, string name, string description);
-    event OpportunityStatusUpdated(uint id, uint status);
-    event ApplicationCreated(uint id, uint opportunityId);
-    event ApplicationStatusUpdated(uint id, uint status);
-    event ApplicationPreAccomplishmentCreated(uint id, uint requirementId, uint applicationId, uint opportunityId);
-    event ApplicationPostAccomplishmentCreated(uint id, uint requirementId, uint applicationId, uint opportunityId);
+    event RegisterOpportunity(uint id, string name, string description);
+    event UpdateOpportunityStatus(uint id, uint status);
+    event RegisterApplication(uint id, uint opportunityId);
+    event UpdateApplicationStatus(uint id, uint status);
+    event RegisterApplicationPreAccomplishment(uint id, uint requirementId, uint applicationId, uint opportunityId);
+    event RegisterApplicationPostAccomplishment(uint id, uint requirementId, uint applicationId, uint opportunityId);
 
     constructor(address _admin) public {
         admin = _admin;
@@ -295,7 +295,7 @@ contract AkasifyCoreContract {
             opportunities[nextOpportunityId].nextPostRequirementId++;
         }
 
-        emit OpportunityCreated(nextOpportunityId, opportunities[nextOpportunityId].name, opportunities[nextOpportunityId].description);
+        emit RegisterOpportunity(nextOpportunityId, opportunities[nextOpportunityId].name, opportunities[nextOpportunityId].description);
         nextOpportunityId++;        
     }
 
@@ -330,7 +330,7 @@ contract AkasifyCoreContract {
         //incrementing pre accomplishment id for application
         applications[nextApplicationId].nextPreAccomplishmentId++;
 
-        emit ApplicationCreated(nextApplicationId, applications[nextApplicationId].opportunityId);
+        emit RegisterApplication(nextApplicationId, applications[nextApplicationId].opportunityId);
         nextApplicationId++;
     }
 
@@ -569,9 +569,11 @@ contract AkasifyCoreContract {
 
             //incrementing pre accomplishment id for application
             applications[applicationId].nextPreAccomplishmentId++;
+            RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId - 1, applications[applicationId].nextPreRequirementId - 1, applicationId, applications[applicationId].opportunityId);
         } else {
+            RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
             applications[applicationId].status = 2;
-        }
+        }        
     }
 
     function createPostAccomplishment(
