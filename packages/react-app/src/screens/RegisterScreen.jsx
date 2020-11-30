@@ -27,8 +27,9 @@ function RegisterScreen ({
     };
 
     useEffect(() => {
-        if (setBeneficiaryEvents && setBeneficiaryEvents[0] && setBeneficiaryEvents[0].account == address) {
-            history.push("/sucess");
+        if (setBeneficiaryEvents && setBeneficiaryEvents[0] && setBeneficiaryEvents[0].account == address) {       
+            console.log("previous page in register: ", localStorage.getItem('akasify-page-previous'));
+            history.push(localStorage.getItem('akasify-page-previous'));
         }
     }, [setBeneficiaryEvents]);
 

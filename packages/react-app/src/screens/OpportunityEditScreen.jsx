@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select, Upload, Modal } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { useParams, useHistory } from "react-router-dom";
 import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
 import moment from 'moment';
@@ -189,6 +189,21 @@ function OpportunityEditScreen ({
         tx(writeContracts.AkasifyCoreContract.createPostRequirement(oppId, preType, preValue, preName));
     }
 
+    const uploadImage = async (data) => {
+        console.log("image data: ", data);
+        const imageStream = await getBase64(data);
+        console.log("image stream: ", imageStream);
+        const response = await fetch('https://rinkeby.infura.io/v3/dfd1cdc752364456af19b6315fb9e415/add', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: imageStream
+        }).then((res) => res.json());
+        const hash = response;
+        console.log("hash: ", hash);
+    }
+
     const uploadButton = (
         <div>
           <PlusOutlined />
@@ -355,7 +370,10 @@ function OpportunityEditScreen ({
                         label="Images"
                         valuePropName="opp-images"
                     >
-                        <Upload
+                        <Upload action={uploadImage}>
+                            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                        </Upload>
+                        {/* <Upload
                             action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                             listType="picture-card"
                             >
@@ -367,7 +385,7 @@ function OpportunityEditScreen ({
                             footer={null}
                             >
                             <img alt="example" style={{ width: '100%' }} />
-                        </Modal>
+                        </Modal> */}
                     </Form.Item>                
                     <Form.Item>
                         <Row gutter={[100, 16]}>

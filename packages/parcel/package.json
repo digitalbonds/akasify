@@ -1,7 +1,7 @@
 {
   "name": "@akasify/parcel-api",
   "version": "0.0.2",
-  "description": "",
+  "description": "Akasify Parcel API",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useHistory, Redirect } from "react-router-dom"
 import { Button, Layout, Row, Typography, Col, Card, Avatar, Tabs, Tag, Table, Carousel, Tooltip, Badge, Divider, Steps, Form, Input, Modal } from 'antd'
-import { EyeOutlined, CalendarOutlined, StarOutlined, TagOutlined } from '@ant-design/icons';
+import { CalendarOutlined, LoadingOutlined, TagOutlined, FileProtectOutlined, DatabaseOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next'
 import { useContractLoader, useContractReader, useBalance, useEventListener, useExchangePrice } from "../hooks";
 import { Transactor } from "../helpers";
@@ -31,6 +31,7 @@ function OpportunityDetailScreen({
   let { id } = useParams();
   let history = useHistory();
   const { t } = useTranslation();
+  const akasifyOasisAppId = "ce904c3e-ddca-4783-8241-b2a2ae7602f3";
 
   const readContracts = useContractLoader(localProvider);
   const writeContracts = useContractLoader(userProvider);
@@ -66,8 +67,10 @@ function OpportunityDetailScreen({
   const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
   const application = useContractReader(readContracts, 'AkasifyCoreContract', "getApplication", [id.replace(":",""), address]);
   const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
+  //console.log("pre requirements: ", preRequirements);
   //const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
   const preAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPreAccomplishmentsByApplicationId', [appId]);
+  //console.log("pre accomplishments: ", preAccomplishments);
   //const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);  
 
   // SMART CONTRACT BROADCAST
@@ -86,7 +89,7 @@ function OpportunityDetailScreen({
   }, [application]);
   
   useEffect(() => {
-    if (setApplicationCreateEvents && setApplicationCreateEvents[0] && setApplicationCreateEvents[0].id > 0) {
+    if (setApplicationCreateEvents) {
         setApplicationModalVisible(false);
     }
   }, [setApplicationCreateEvents]);
@@ -94,6 +97,7 @@ function OpportunityDetailScreen({
   useEffect(() => {
     if (setPreAccomplishmentCreateEvents && setPreAccomplishmentCreateEvents[0] && setPreAccomplishmentCreateEvents[0].id > 0) {
         setPreAccomplishmentModalStep(preAccomplishmentModalStep + 1);
+        setPreAcValue("");
     }
   }, [setPreAccomplishmentCreateEvents]);
 
@@ -103,14 +107,26 @@ function OpportunityDetailScreen({
   const obtainIdToken = async () => {
     localStorage.setItem('akasify-oasis-previous', history.location.pathname);
     const request = await oidcClient.createSigninRequest();
+    //localStorage.setItem('akasify-request-url', request.url);
     window.location.assign(request.url);
+  };
+
+  const assignPermission = async () => {
+    localStorage.setItem('akasify-oasis-previous', history.location.pathname);
+    const permissionUrl = `https://steward.oasiscloud.io/apps/${akasifyOasisAppId}/join?redirect_uri=http://localhost:3000/callback`;
+    window.location.assign(permissionUrl);
+  }
+
+  const registerBeneficiary = async () => {
+    localStorage.setItem('akasify-page-previous', history.location.pathname);
+    window.location.assign("/register");
   };
 
   const currentPreRequirement = () => {
     if (preAccomplishments && preAccomplishments.length > 0) {
       //console.log("step 2, ", preAccomplishments);
       // if (BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber()) {
-      //   console.log("step 3");
+      //   //console.log("step 3");
       //   if (BigNumber.from(preAccomplishments[3][preAccomplishments[3].length - 1]).toNumber() == 1) {
       //     // PRE REQUIREMENT INITIATED
       //     return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber();
@@ -134,14 +150,16 @@ function OpportunityDetailScreen({
         applicationId: appId,
         opportunityId: appOpportunityId,
         value: preAcValue,
-        token: localStorage.getItem('akasify-oasis-token')
+        beneficiaryAddress: localStorage.getItem('akasify-oasis-address')
+        //token: localStorage.getItem('akasify-oasis-token')
       })
     }).then((res) => res.json());
-    createPreAccomplishment(response);
+    createPreAccomplishment(response.datasetAddress);
   }
 
   const createPreAccomplishment = async (datasetAddress) => {
     setPreAccomplishmentModalStep(preAccomplishmentModalStep + 1);
+    console.log("dataset address: ", datasetAddress);
     // CREATING PRE ACCOMPLISHMENT WITH CONTENT ADDRESS FROM OASIS
     tx(writeContracts.AkasifyCoreContract.createPreAccomplishment(appId, datasetAddress));
   }
@@ -215,19 +233,25 @@ function OpportunityDetailScreen({
   ];
   
   const preAccomplishmentData = () => {
-    let data = [];
+    let data = [];    
     if (preAccomplishments) {
-        for (let i = 0; i < preAccomplishments[0].length; i++) {
-            data.push(
-                {
-                    id: BigNumber.from(preAccomplishments[0][i]).toNumber(),
-                    key: BigNumber.from(preAccomplishments[0][i]).toNumber(),
-                    tags: BigNumber.from(preAccomplishments[3][i]).toNumber(),
-                    value: preAccomplishments[4][i],
-                    name: preAccomplishments[4][i]
-                }
-            )
+      for (let i = 0; i < preAccomplishments[0].length; i++) {
+        let aT = "";
+        if (BigNumber.from(preAccomplishments[3][i]).toNumber() == 1) {
+          aT = "step initiated automatically by smart contract";
+        } else {
+          aT = preAccomplishments[4][i];
         }
+        data.push(
+            {
+                id: BigNumber.from(preAccomplishments[0][i]).toNumber(),
+                key: BigNumber.from(preAccomplishments[0][i]).toNumber(),
+                tags: BigNumber.from(preAccomplishments[3][i]).toNumber() == 1 ? "started" : "finished",
+                value: preAccomplishments[4][i],
+                name: aT
+            }
+        );
+      }
     }
     return data;
 };
@@ -294,7 +318,10 @@ function OpportunityDetailScreen({
                   {role == "beneficiary" && <Button type="primary" style={{marginBottom: '15px'}} block onClick={()=>{
                     setApplicationModalVisible(true)
                   }} disabled={appLastUpdate > 0 ? true : false}>Apply</Button>}
-                  {role == "visitor" && <Button type="primary" style={{marginBottom: '15px'}} block href="/register">Register as beneficiary</Button>}                  
+                  { role == "visitor" && <Button type="primary" style={{marginBottom: '15px'}}
+                    block
+                    onClick={() => { registerBeneficiary() }}>Register as beneficiary</Button>
+                  }                  
                 </Col>
               </Row>
             </div>
@@ -307,7 +334,7 @@ function OpportunityDetailScreen({
             <Col span={5}>              
               <Steps direction="vertical" current={currentPreRequirement()}>
                 {preRequirementData().map(preRequirement => {
-                  return (<Step title={preRequirement.name} />)
+                  return (<Step key={preRequirement.id} title={preRequirement.name} />)
                 })}
               </Steps>
             </Col>
@@ -386,12 +413,12 @@ function OpportunityDetailScreen({
         title="Pre Accomplishment"
         visible={preAccomplishmentModalVisible}
         onOk={ () => { setPreAccomplishmentModalVisible(false) } }
+        onCancel={ () => { setPreAccomplishmentModalVisible(false) } }
       >
-        <Paragraph>To set up or Login your Oasis account, click Ok</Paragraph>
-        <Steps direction="horizontal" current={preAccomplishmentModalStep}>
-          <Step title={"Encrypting your information"} />
-          <Step title={"Creating pre accomplishment on the blockchain"} />
-          <Step title={"Completed"} />
+        <Steps direction="vertical" current={preAccomplishmentModalStep}>
+          <Step title={"Securing"} description={"Your data is being encrypted with you as the only owner."} icon={ preAccomplishmentModalStep == 0 ? <LoadingOutlined /> : <FileProtectOutlined /> }/>
+          <Step title={"Storing"} description={"The encrypted data is being stored on the blockchain."} icon={ preAccomplishmentModalStep == 1 ?<LoadingOutlined /> : <DatabaseOutlined /> } />
+          <Step title={"Completed"} description={"The pre accomplishment has been stored securely."} icon={ <CheckCircleOutlined /> } />
         </Steps>
       </Modal>
     </Layout>

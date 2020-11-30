@@ -19,6 +19,7 @@ import CallbackScreen from './screens/CallbackScreen'
 import RegisterScreen from './screens/RegisterScreen'
 import RegisterSucessScreen from './screens/RegisterSucessScreen'
 import HomeScreen from './screens/HomeScreen'
+import ApplicationScreen from './screens/ApplicationScreen'
 import OpportunityScreen from './screens/OpportunityScreen'
 import OpportunityDetailScreen from './screens/OpportunityDetailScreen'
 import OpportunityEditScreen from './screens/OpportunityEditScreen'
@@ -143,6 +144,7 @@ function App(props) {
               logoutOfWeb3Modal={logoutOfWeb3Modal}
             />
             <Switch>
+            <Route path='/applications:opportunityId' render={() => <ApplicationScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/opportunityedit:id' render={() => <OpportunityEditScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>

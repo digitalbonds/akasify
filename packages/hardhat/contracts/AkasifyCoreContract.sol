@@ -563,7 +563,7 @@ contract AkasifyCoreContract {
                     applications[applicationId].nextPreRequirementId,
                     block.timestamp,
                     1,                        //started
-                    accomplishmentValue
+                    ""
                 )
             );
 
