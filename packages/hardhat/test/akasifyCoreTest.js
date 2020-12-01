@@ -33,7 +33,7 @@ describe('Digital Bonds - Smart Contract Tests', function () {
     // });
 
     it('Should register a beneficiary', async () => {      
-      await akasifyCore.connect(beneficiary).registerBeneficiary();
+      await akasifyCore.connect(beneficiary).registerBeneficiary("0x123");
       const beneficiaryAddress = await beneficiary.getAddress();
       const role = await akasifyCore.getRole(beneficiaryAddress);
       assert(role === 'beneficiary', 'verify roles');

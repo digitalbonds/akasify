@@ -46,6 +46,38 @@ function OpportunityEditScreen ({
         return "";
     }
 
+    const statusText = () => {
+        let status = "";
+        if (oppStatus) {
+            switch (oppStatus) {
+                case 1:
+                    status = "draft";
+                    break;
+                case 2:
+                    status = "open to applications";
+                    break;
+                case 3:
+                    status = "reviewing applications";
+                    break;
+                case 4:
+                    status = "applications selected";
+                    break;
+                case 5:
+                    status = "opportunity initiated";
+                    break;
+                case 6:
+                    status = "opportunity finalized";
+                    break;
+                case 7:
+                    status = "postRequirements concluded";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return status;
+    }
+
     useEffect(() => {
         if (opportunity && oppLastUpdate != BigNumber.from(opportunity[6]).toNumber()) {
             setOppId(BigNumber.from(opportunity[0]).toNumber());
@@ -358,8 +390,7 @@ function OpportunityEditScreen ({
                         <Input
                             disabled
                             placeholder={0}
-                            value={oppStatus}
-                            onChange={e => setOppStatus(e.target.value)} />
+                            value={statusText()} />
                     </Form.Item>
                     <Form.Item
                         name="opp-images"

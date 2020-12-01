@@ -1,6 +1,6 @@
 import React from "react";
 import { Row, Col, Tag, Badge, Card, Avatar, List, Layout, Tooltip, Button } from "antd";
-import { EyeOutlined, CalendarOutlined, FormOutlined, StarOutlined, TagOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { FileSearchOutlined, CalendarOutlined, FormOutlined, StarOutlined, TagOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
 import opportunityAvatar from "../assets/images/opportunity_avatar.png";
@@ -150,15 +150,12 @@ function OpportunityScreen ({
                     src={item.image}
                   />
                 }
-                actions={[
-                  <Tooltip placement="bottom" title="views">
-                    <Badge count={0} offset={[15, 0]}><EyeOutlined key="views" /></Badge>
+                actions={ role === "organization" && [
+                  <Tooltip placement="bottom" title="edit opportunity">
+                    <NavLink to={'/opportunityedit:' + item.id}><FormOutlined key="edit" /></NavLink>
                   </Tooltip>,
-                  <Tooltip placement="bottom" title="saved">
-                    <StarOutlined key="bookmark" />
-                  </Tooltip>,
-                  <Tooltip placement="bottom" title="application">
-                    <NavLink to={'/opportunity:' + item.id}><FormOutlined key="apply" /></NavLink>
+                  <Tooltip placement="bottom" title="review applications">
+                    <NavLink to={'/applications:' + item.id}><FileSearchOutlined key="review" /></NavLink>
                   </Tooltip>
                 ]}
               >

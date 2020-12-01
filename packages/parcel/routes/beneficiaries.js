@@ -56,7 +56,7 @@ router.post('/createStep', async (req, res, next) => {
 
         // 6. RETURN ADDRESS
         res.json( {
-            datasetAddress: dataset.address
+            datasetAddress: dataset.address._hex
         });
 
     } catch (err) {

@@ -29,6 +29,7 @@ function ApplicationReviewScreen ({
     const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
     const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", id.replace(":",""));
     const applications = useContractReader(readContracts, 'AkasifyCoreContract', "getApplicationsByOpportunityId", id.replace(":",""));
+    console.log("applications: ", applications);
     
     const oppOrganization = () => {
         if (organization)
@@ -66,6 +67,38 @@ function ApplicationReviewScreen ({
     // APPLICATION
     const [preRow, setPreRow] = useState(0);
 
+    const statusText = () => {
+        let status = "";
+        if (oppStatus) {
+            switch (oppStatus) {
+                case 1:
+                    status = "draft";
+                    break;
+                case 2:
+                    status = "open to applications";
+                    break;
+                case 3:
+                    status = "reviewing applications";
+                    break;
+                case 4:
+                    status = "applications selected";
+                    break;
+                case 5:
+                    status = "opportunity initiated";
+                    break;
+                case 6:
+                    status = "opportunity finalized";
+                    break;
+                case 7:
+                    status = "postRequirements concluded";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return status;
+    }
+
     const applicationColumns = [
         {
           title: 'No.',
@@ -78,18 +111,17 @@ function ApplicationReviewScreen ({
           key: 'beneficiary',
         },
         {
-            title: 'Submission',
-            dataIndex: 'submission',
-            key: 'submission',
-          },
-        {
           title: 'Action',
           key: 'action',
           dataIndex: 'action',
-          render: (type) => (
+          render: (applicationId) => (
             <span>
-                <NavLink to={`/application/${id.replace(":","")}`}>
-                    {type}
+                <NavLink
+                    disabled={ oppStatus == 3 ? false : true}
+                    to={`/applicationdetail:${applicationId}`}>
+                    <Button>
+                        Review Application
+                    </Button>                
                 </NavLink>
             </span>
           ),
@@ -99,14 +131,13 @@ function ApplicationReviewScreen ({
     const applicationData = () => {
         let data = [];
         if (applications) {
-            for (let i = 0; i < preRequirements[0].length; i++) {
+            for (let i = 0; i < applications[0].length; i++) {
                 data.push(
                     {
-                        id: BigNumber.from(preRequirements[0][i]).toNumber(),
-                        key: BigNumber.from(preRequirements[0][i]).toNumber(),
-                        type: BigNumber.from(preRequirements[1][i]).toNumber(),
-                        value: BigNumber.from(preRequirements[2][i]).toNumber(),
-                        name: preRequirements[3][i]
+                        id: BigNumber.from(applications[0][i]).toNumber(),
+                        key: BigNumber.from(applications[0][i]).toNumber(),
+                        beneficiary: applications[1][i],
+                        action: BigNumber.from(applications[0][i]).toNumber()
                     }
                 )
             }
@@ -123,13 +154,13 @@ function ApplicationReviewScreen ({
         console.log('selectedRowKeys changed: ', selectedRowKeys[0]);
         setPreRow(selectedRowKeys[0]);
         console.log('preRow: ', preRow);
-        console.log('preRequirements: ', preRequirements);
+        console.log('applications: ', applications);
 
-        if (preRequirements) {
-            setPreId(BigNumber.from(preRequirements[0][preRow]).toNumber());
-            setPreType(2);
-            setPreValue(BigNumber.from(preRequirements[2][preRow]).toNumber());            
-            setPreName(preRequirements[3][preRow]);
+        if (applications) {
+            //setPreId(BigNumber.from(applications[0][preRow]).toNumber());
+            //setPreType(2);
+            //setPreValue(BigNumber.from(applications[2][preRow]).toNumber());            
+            //setPreName(applications[3][preRow]);
         }        
     };
 
@@ -143,29 +174,34 @@ function ApplicationReviewScreen ({
                     layout="vertical"
                     style={{marginTop: "12px"}}
                     form={oppForm}
-                    onFinish={onOppCreate}
                 >
-                    <Form.Item
-                        name="opp-id"
-                        label="Id"
-                        valuePropName="opp-id"
-                    >
-                        <Input
-                            placeholder="opportunity id"
-                            disabled
-                            value={oppId}
-                            onChange={e => setOppId(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item
-                        name="opp-organization-name"
-                        label="Organization"
-                        valuePropName="opp-organization-name"
-                    >
-                        <Input
-                            disabled
-                            placeholder="organization name"
-                            value={oppOrganization()} />
-                    </Form.Item>
+                    <Row>
+                        <Col span={11}>
+                            <Form.Item
+                                name="opp-id"
+                                label="Id"
+                                valuePropName="opp-id"
+                            >
+                                <Input
+                                    placeholder="opportunity id"
+                                    disabled
+                                    value={oppId}
+                                    onChange={e => setOppId(e.target.value)} />
+                            </Form.Item>
+                        </Col>
+                        <Col span={11} offset={2}>
+                            <Form.Item
+                                name="opp-organization-name"
+                                label="Organization"
+                                valuePropName="opp-organization-name"
+                            >
+                                <Input
+                                    disabled
+                                    placeholder="organization name"
+                                    value={oppOrganization()} />
+                            </Form.Item>
+                        </Col>
+                    </Row>                                        
                     <Form.Item
                         name="opp-name"
                         label="Name"
@@ -202,7 +238,7 @@ function ApplicationReviewScreen ({
                             autoSize={{ minRows: 2, maxRows: 6 }}
                         />
                     </Form.Item>
-                    <Row gutter={[100, 16]}>
+                    <Row gutter={[100, 0]}>
                         <Col span={6}>
                             <Form.Item
                             name="opp-creation-date"
@@ -268,16 +304,13 @@ function ApplicationReviewScreen ({
                         <Input
                             disabled
                             placeholder={0}
-                            value={oppStatus}
-                            onChange={e => setOppStatus(e.target.value)} />
+                            value={statusText()}
+                        />
                     </Form.Item>
                     <Form.Item>
-                        <Row gutter={[100, 16]}>
+                        <Row gutter={[100, 0]}>
                             <Col span={1}>
-                                <Button type="primary" htmlType="submit">Save</Button>
-                            </Col>
-                            <Col span={1}>
-                                <Button type="primary" onClick={(e) => {onOppUpdateStatus(e)}} htmlType="submit">Complete Evaluation</Button>
+                                <Button type="primary" onClick={(e) => {onOppUpdateStatus(e)}} htmlType="submit">Next Status</Button>
                             </Col>
                         </Row>
                     </Form.Item>

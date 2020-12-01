@@ -18,6 +18,7 @@ contract AkasifyCoreContract {
     struct Beneficiary {
         uint id;
         address payable account;
+        string oasisAddress;
         uint registerDate;
         uint status;
     }
@@ -180,23 +181,26 @@ contract AkasifyCoreContract {
     }
 
     function registerBeneficiaryByAdmin(
-        address payable account,
-        uint status
+        address payable _account,
+        string memory _oasisAddress,
+        uint _status
     ) public onlyAdmin() {
         beneficiaries[nextBeneficiaryId] = Beneficiary(
             nextBeneficiaryId,
-            account,
+            _account,
+            _oasisAddress,
             block.timestamp,
-            status
+            _status
         );
         nextBeneficiaryId++;
-        emit RegisterBeneficiary(account);
+        emit RegisterBeneficiary(_account);
     }
 
-    function registerBeneficiary() public notAdmin() notOrganization() {
+    function registerBeneficiary(string memory _oasisAddress) public notAdmin() notOrganization() {
         beneficiaries[nextBeneficiaryId] = Beneficiary(
             nextBeneficiaryId,
             msg.sender,
+            _oasisAddress,
             block.timestamp,
             3
         );
@@ -439,29 +443,28 @@ contract AkasifyCoreContract {
     }
 
     function getApplicationsByOpportunityId(uint opportunityId) 
-        public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, uint[] memory) {
+        public view returns(uint[] memory, address[] memory, string[] memory, uint[] memory) {
 
         Opportunity storage _opportunity = opportunities[opportunityId];
         uint[] memory appIds = new uint[](_opportunity.applicationCount);
-        uint[] memory appBeneficiaryIds = new uint[](_opportunity.applicationCount);
-        uint[] memory appCreationDates = new uint[](_opportunity.applicationCount);
-        uint[] memory appLastUpdates = new uint[](_opportunity.applicationCount);
+        address[] memory appBeneficiaryAddress = new address[](_opportunity.applicationCount);
+        string[] memory appBeneficiaryOasisAddress = new string[](_opportunity.applicationCount);
         uint[] memory appStatus = new uint[](_opportunity.applicationCount);
 
         uint appCount = 0;
         for (uint i = 0; i < nextApplicationId; i++) {
-            Application memory _application = applications[i];            
+            Application memory _application = applications[i];    
+            Beneficiary memory _beneficiary = beneficiaries[_application.beneficiaryId];        
             if (_application.opportunityId == opportunityId) {
                 appIds[appCount] = _application.id;
-                appBeneficiaryIds[appCount] = _application.beneficiaryId;
-                appCreationDates[appCount] = _application.creationDate;
-                appLastUpdates[appCount] = _application.lastUpdate;
+                appBeneficiaryAddress[appCount] = _beneficiary.account;
+                appBeneficiaryOasisAddress[appCount] = _beneficiary.oasisAddress;                
                 appStatus[appCount] = _application.status;
                 appCount++;
             }
         }
         
-        return (appIds, appBeneficiaryIds, appCreationDates, appLastUpdates, appStatus);
+        return (appIds, appBeneficiaryAddress, appBeneficiaryOasisAddress, appStatus);
 
     }
 
@@ -605,15 +608,15 @@ contract AkasifyCoreContract {
                 )
             );
 
-            //RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
-
+            RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
             //incrementing pre accomplishment id for application
-            applications[applicationId].nextPreAccomplishmentId++;
-            //RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId - 1, applications[applicationId].nextPreRequirementId - 1, applicationId, applications[applicationId].opportunityId);
+            applications[applicationId].nextPreAccomplishmentId++;            
         } else {
-            //RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
             applications[applicationId].status = 2;
-        }        
+            RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
+        }
+
+        applications[applicationId].lastUpdate = block.timestamp;      
     }
 
     function createPostAccomplishment(

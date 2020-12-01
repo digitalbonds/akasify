@@ -8,8 +8,6 @@ import { Transactor } from "../helpers";
 import opportunityAvatar from "../assets/images/opportunity_avatar.png";
 import * as moment from "moment";
 import { BigNumber } from "@ethersproject/bignumber";
-import { parcelConfig } from "../helpers/parcelConfig";
-import { OidcClient, Log } from "oidc-client";
 import oasisLogo from "../assets/images/oasis_logo.png";
 
 const { TextArea } = Input;
@@ -66,11 +64,12 @@ function OpportunityDetailScreen({
   // SMART CONTRACT HOOKS
   const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
   const application = useContractReader(readContracts, 'AkasifyCoreContract', "getApplication", [id.replace(":",""), address]);
+  //console.log("application: ", application);
   const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
   //console.log("pre requirements: ", preRequirements);
   //const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
   const preAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPreAccomplishmentsByApplicationId', [appId]);
-  console.log("pre accomplishments: ", preAccomplishments);
+  //console.log("pre accomplishments: ", preAccomplishments);
   //const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);  
 
   // SMART CONTRACT BROADCAST
@@ -102,18 +101,10 @@ function OpportunityDetailScreen({
   }, [setPreAccomplishmentCreateEvents]);
 
   // OASIS PARCEL
-  const oidcClient = new OidcClient(parcelConfig);
-
-  const obtainIdToken = async () => {
-    localStorage.setItem('akasify-oasis-previous', history.location.pathname);
-    const request = await oidcClient.createSigninRequest();
-    window.location.assign(request.url);
-  };
-
   const assignPermission = async () => {
     localStorage.setItem('akasify-oasis-previous', history.location.pathname);
     const permissionUrl = `https://steward.oasiscloud.io/apps/${akasifyOasisAppId}/join?redirect_uri=http://localhost:3000/callback`;
-    window.location.assign(permissionUrl);
+    window.open(permissionUrl);
   }
 
   const registerBeneficiary = async () => {
@@ -167,6 +158,7 @@ function OpportunityDetailScreen({
   const onApplicationCreate =() => {
     tx( writeContracts.AkasifyCoreContract.createApplication(id.replace(":","")) );
   }
+
   const onPreAccomplishmentCreate = () => {
     if (localStorage.getItem('akasify-oasis-address') == "" && localStorage.getItem('akasify-oasis-token') == "") {
       setOasisModalVisible(true);
@@ -177,7 +169,7 @@ function OpportunityDetailScreen({
       // UPLOADING DATA TO OASIS
       uploadData();
     }
-};
+  }
 
   const preRequirementData = () => {
     let data = [];
@@ -314,13 +306,25 @@ function OpportunityDetailScreen({
               <Divider />
               <Row justify="center">
                 <Col span={12}>
-                  {role == "beneficiary" && <Button type="primary" style={{marginBottom: '15px'}} block onClick={()=>{
-                    setApplicationModalVisible(true)
-                  }} disabled={appLastUpdate > 0 ? true : false}>Apply</Button>}
-                  { role == "visitor" && <Button type="primary" style={{marginBottom: '15px'}}
-                    block
-                    onClick={() => { registerBeneficiary() }}>Register as beneficiary</Button>
-                  }                  
+                  { role === "beneficiary" && <Button
+                      type="primary"
+                      block
+                      disabled={appLastUpdate > 0 ? true : false}
+                      onClick={()=>{
+                        setApplicationModalVisible(true)
+                      }}>Apply</Button>}
+                  { role === "visitor" && <Button
+                      type="primary"
+                      style={{marginTop: '15px'}}
+                      block
+                      onClick={() => { registerBeneficiary() }}>Register as beneficiary</Button>
+                  }
+                  { role === "beneficiary" && appStatus === 2 && <Button
+                      type="primary"
+                      style={{marginTop: '15px'}}
+                      block
+                      onClick={() => { setOasisModalVisible(true) }}>Verify Privacy Policy</Button>
+                  }
                 </Col>
               </Row>
             </div>
@@ -362,7 +366,7 @@ function OpportunityDetailScreen({
                     <TextArea
                         placeholder="value"
                         autoSize={{ minRows: 10, maxRows: 20 }}
-                        disabled={ localStorage.getItem('akasify-oasis-address') == "" && localStorage.getItem('akasify-oasis-token') == "" ? true : false }
+                        disabled={ appStatus === 2 ? true : false }
                         value={preAcValue}
                         onChange={e => setPreAcValue(e.target.value)}
                     />
@@ -370,9 +374,7 @@ function OpportunityDetailScreen({
                 <Form.Item>
                     <Row gutter={[100, 16]}>
                         <Col span={1}>
-                            <Button type="primary" htmlType="submit">{
-                              localStorage.getItem('akasify-oasis-address') == "" && localStorage.getItem('akasify-oasis-token') == "" ? "Sign Oasis" : "Save"
-                            }</Button>
+                            <Button type="primary" htmlType="submit" disabled={ appStatus === 2 ? true : false }>Save</Button>
                         </Col>
                     </Row>
                 </Form.Item>
@@ -396,21 +398,21 @@ function OpportunityDetailScreen({
         <Paragraph type={"secondary"}>Please remember, your commitment with this opportunity will be recorded and it could improve your chances on future opportunities.</Paragraph>
       </Modal>
       <Modal
-        title="Data Privacy"
+        title="Privacy Policy"
         visible={oasisModalVisible}
-        onOk={obtainIdToken}
+        okText={"Verify"}
+        onOk={assignPermission}
         onCancel={ () => { setOasisModalVisible(false) } }
       >
         <img src={oasisLogo} style={{display: 'block', marginLeft: 'auto', marginRight: 'auto', marginBottom: '25px', width: '50%'}} alt='Oasis Labs' />
         <Paragraph>
-          Here at Akasify, your privacy is very important to us. We've partned with
-          Oasis Labs so you can own your application sensitive data from our app.
+          In Akasify, you are the sole owner of your data. Because of that, you need to give permission the organization to read your application data.
         </Paragraph>
-        <Paragraph>To set up or Login your Oasis account, click Ok</Paragraph>
+        <Paragraph>Remember you can grant and revoke access at any time, but please, remember an invalid permission during reviewing application may result in a rejection.</Paragraph>
       </Modal>
       <Modal
         title="Pre Accomplishment"
-        visible={preAccomplishmentModalVisible}
+        visible={preAccomplishmentModalVisible}        
         onOk={ () => { setPreAccomplishmentModalVisible(false) } }
         onCancel={ () => { setPreAccomplishmentModalVisible(false) } }
       >

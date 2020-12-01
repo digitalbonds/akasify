@@ -472,19 +472,14 @@
         "type": "uint256[]"
       },
       {
-        "internalType": "uint256[]",
+        "internalType": "address[]",
         "name": "",
-        "type": "uint256[]"
+        "type": "address[]"
       },
       {
-        "internalType": "uint256[]",
+        "internalType": "string[]",
         "name": "",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
+        "type": "string[]"
       },
       {
         "internalType": "uint256[]",
@@ -1307,7 +1302,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_oasisAddress",
+        "type": "string"
+      }
+    ],
     "name": "registerBeneficiary",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1317,12 +1318,17 @@
     "inputs": [
       {
         "internalType": "address payable",
-        "name": "account",
+        "name": "_account",
         "type": "address"
       },
       {
+        "internalType": "string",
+        "name": "_oasisAddress",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
-        "name": "status",
+        "name": "_status",
         "type": "uint256"
       }
     ],

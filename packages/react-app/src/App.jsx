@@ -17,7 +17,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 import RegisterSucessScreen from "./screens/RegisterSucessScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ApplicationReviewScreen from "./screens/ApplicationReviewScreen";
-//import ApplicationReviewDetailScreen from "./screens/ApplicationReviewDetailScreen";
+import ApplicationReviewDetailScreen from "./screens/ApplicationReviewDetailScreen";
 import OpportunityScreen from "./screens/OpportunityScreen";
 import OpportunityDetailScreen from "./screens/OpportunityDetailScreen";
 import OpportunityEditScreen from "./screens/OpportunityEditScreen";
@@ -124,8 +124,8 @@ function App(props) {
               logoutOfWeb3Modal={logoutOfWeb3Modal}
             />
             <Switch>
-              {/* <Route path='/applicationdetail:applicationId' render={() => <ApplicationReviewDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/> */}
-              <Route path='/applications:opportunityId' render={() => <ApplicationReviewScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              <Route path='/applicationdetail:id' render={() => <ApplicationReviewDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              <Route path='/applications:id' render={() => <ApplicationReviewScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/opportunityedit:id' render={() => <OpportunityEditScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
