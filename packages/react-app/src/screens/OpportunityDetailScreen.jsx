@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { Button, Layout, Row, Typography, Col, Card, Avatar, Tabs, Tag, Table, Carousel, Tooltip, Badge, Divider, Steps, Form, Input, Modal } from "antd";
+import { Button, Layout, Row, Typography, Col, Card, Avatar, Tabs, Result, Table, Carousel, Tooltip, Divider, Steps, Form, Input, Modal } from "antd";
 import { CalendarOutlined, LoadingOutlined, TagOutlined, FileProtectOutlined, DatabaseOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useContractLoader, useContractReader, useBalance, useEventListener, useExchangePrice } from "../hooks";
@@ -13,7 +13,7 @@ import oasisLogo from "../assets/images/oasis_logo.png";
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 const { Meta } = Card;
-const { Paragraph } = Typography;
+const { Paragraph, Text } = Typography;
 const { Step } = Steps;
 
 function OpportunityDetailScreen({
@@ -238,6 +238,22 @@ function OpportunityDetailScreen({
 
   return (
     <Layout className="site-layout">
+      { role === "beneficiary" && application && appLastUpdate > 0 && appStatus == 3 &&
+        <Result
+          status={ "success" }
+          title={ "Congratulations" }
+          subTitle={ "Your application has been approved! The organization will contact you shortly." }
+        >
+        </Result>
+      }
+      { role === "beneficiary" && application && appLastUpdate > 0 && appStatus == 4 &&
+        <Result
+          status={ "error" }
+          title={ "Sorry" }
+          subTitle={ "You application wasn't selected this time." }
+        >
+        </Result>
+      }
       <Card
         style={{ width: '100%' }}
         cover={
@@ -257,13 +273,23 @@ function OpportunityDetailScreen({
           description={
             <div className="opportunity-detail-card">
               <Row justify="space-between" style={{marginBottom: "8px"}}>
-                <Col span={2}>
+                <Col span={4}>
                   <Tooltip placement="left" title="deadline">
-                    <CalendarOutlined />
+                    Pre requirement deadline:
                   </Tooltip>
                 </Col>
-                <Col span={22}>
+                <Col span={20}>
                   {opportunity && moment.unix(opportunity[3]).format(dateFormat)}
+                </Col>
+              </Row>
+              <Row justify="space-between" style={{marginBottom: "8px"}}>
+                <Col span={4}>
+                  <Tooltip placement="left" title="deadline">
+                    Post requirement deadline:
+                  </Tooltip>
+                </Col>
+                <Col span={20}>
+                  {opportunity && moment.unix(opportunity[4]).format(dateFormat)}
                 </Col>
               </Row>
               <Divider />
@@ -272,28 +298,7 @@ function OpportunityDetailScreen({
               </Row>
               <Divider />
               <Row justify="center">
-                <Col span={12}>
-                  { role === "beneficiary" && application && application[0].length > 0 && 
-                    <Result
-                      status={ appStatus === 3 ? "success" : "error" }
-                      title={ appStatus == 3 ? "Congratulations" : "Sorry" }
-                      subTitle={appStatus == 3 ? "Your application has been approved!" : "You application wasn't selected this time."}
-                    >
-                      <div className="desc">
-                          <Paragraph>
-                              <Text
-                              strong
-                              style={{
-                                  fontSize: 16,
-                              }}
-                              >
-                                { appStatus == 3 ? 
-                                  "Please keep an eye on your email, the organization will contact you for the opportunity proccess." : "There are more opportunities to apply, continue doing good for social good."}
-                              </Text>
-                          </Paragraph>
-                      </div>
-                    </Result>
-                  }
+                <Col span={12}>                  
                   { role === "beneficiary" && <Button
                       type="primary"
                       block
@@ -352,9 +357,8 @@ function OpportunityDetailScreen({
                     // ]}
                 >
                     <TextArea
-                        placeholder="value"
                         autoSize={{ minRows: 10, maxRows: 20 }}
-                        disabled={ appStatus === 2 ? true : false }
+                        disabled={ appStatus === 1 ? false : true }
                         value={preAcValue}
                         onChange={e => setPreAcValue(e.target.value)}
                     />
@@ -362,7 +366,7 @@ function OpportunityDetailScreen({
                 <Form.Item>
                     <Row gutter={[100, 16]}>
                         <Col span={1}>
-                            <Button type="primary" htmlType="submit" disabled={ appStatus === 2 ? true : false }>Save</Button>
+                            <Button type="primary" htmlType="submit" disabled={ appStatus === 1 ? false : true }>Save</Button>
                         </Col>
                     </Row>
                 </Form.Item>

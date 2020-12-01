@@ -542,27 +542,27 @@ contract AkasifyCoreContract {
         return accomplishment;
     }
 
-    function getPostAccomplishments(uint applicationId)
-        public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, string[] memory) {
+    // function getPostAccomplishments(uint applicationId)
+    //     public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, string[] memory) {
 
-        Application storage _application = applications[applicationId];
-        uint[] memory postAccomplishmentIds = new uint[](_application.nextPostRequirementId);
-        uint[] memory postRequirementIds = new uint[](_application.nextPostRequirementId);
-        uint[] memory postAccomplishDates = new uint[](_application.nextPostRequirementId);
-        uint[] memory postAccomplishCategories = new uint[](_application.nextPostRequirementId);
-        string[] memory postAccomplishValues = new string[](_application.nextPostRequirementId);
+    //     Application storage _application = applications[applicationId];
+    //     uint[] memory postAccomplishmentIds = new uint[](_application.nextPostRequirementId);
+    //     uint[] memory postRequirementIds = new uint[](_application.nextPostRequirementId);
+    //     uint[] memory postAccomplishDates = new uint[](_application.nextPostRequirementId);
+    //     uint[] memory postAccomplishCategories = new uint[](_application.nextPostRequirementId);
+    //     string[] memory postAccomplishValues = new string[](_application.nextPostRequirementId);
         
 
-        for (uint i = 0; i < _application.nextPostAccomplishmentId; i++) {
-            Accomplishment memory _accomplishment = _application.postAccomplishments[i];
-            postAccomplishmentIds[i] = _accomplishment.id;
-            postRequirementIds[i] = _accomplishment.requirementId;
-            postAccomplishDates[i] = _accomplishment.accomplishDate;
-            postAccomplishCategories[i] = _accomplishment.accomplishCategory;
-            postAccomplishValues[i] = _accomplishment.accomplishValue;
-        }
-        return (postAccomplishmentIds, postRequirementIds, postAccomplishDates, postAccomplishCategories, postAccomplishValues);
-    }
+    //     for (uint i = 0; i < _application.nextPostAccomplishmentId; i++) {
+    //         Accomplishment memory _accomplishment = _application.postAccomplishments[i];
+    //         postAccomplishmentIds[i] = _accomplishment.id;
+    //         postRequirementIds[i] = _accomplishment.requirementId;
+    //         postAccomplishDates[i] = _accomplishment.accomplishDate;
+    //         postAccomplishCategories[i] = _accomplishment.accomplishCategory;
+    //         postAccomplishValues[i] = _accomplishment.accomplishValue;
+    //     }
+    //     return (postAccomplishmentIds, postRequirementIds, postAccomplishDates, postAccomplishCategories, postAccomplishValues);
+    // }
 
     function getPostAccomplishment(uint applicationId, uint postAccomplishmentId) 
         public view returns(Accomplishment memory _accomplishment) {
@@ -762,15 +762,6 @@ contract AkasifyCoreContract {
         }
 
         applications[applicationId].status = status;
-
-        //1. preRequirements started => beneficiary
-        //2. preRequirements finalized => beneficiary
-        //3. application approved => organization
-        //4. application rejected => organization
-        //5. postRequirement started => organization
-        //6. postRequirement finalized => beneficiary
-        //7. application complete => organization
-        //8. application incomplete => organization
     }
 
     //validations

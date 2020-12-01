@@ -140,7 +140,7 @@ function ApplicationReviewDetailScreen({
   const disclosureDataset = async (datasetAddress) => {      
       if (datasetAddress.length > 0) {
         setPreAcValue("Loading...");
-        const response = await fetch(`${parcelUrlAPI}/beneficiaries/getStep`, {
+        const response = await fetch(`${parcelUrlAPI}/organizations/getStep`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -148,8 +148,14 @@ function ApplicationReviewDetailScreen({
             body: JSON.stringify({
                 datasetAddress: datasetAddress
             })
-          }).then((res) => res.json());
-          setPreAcValue(response.datasetData);
+          }).then((res) => res.json())
+          .catch((error) => "permission_denied");
+          if (response === "permission_denied") {
+            setPreAcValue("The dataset policy has been revoked, please contact the beneficiary.");
+          } else {
+            const secretData = JSON.parse(response.datasetData);
+            setPreAcValue(secretData.data);  
+          }
       }      
   }
 
@@ -375,7 +381,6 @@ function ApplicationReviewDetailScreen({
                     // ]}
                 >
                     <TextArea
-                        placeholder="value"
                         autoSize={{ minRows: 10, maxRows: 20 }}
                         disabled={ appStatus === 2 ? true : false }
                         value={preAcValue}
