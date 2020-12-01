@@ -179,8 +179,7 @@ function OpportunityEditScreen ({
     const preRequirementData = () => {
         let data = [];
         if (preRequirements) {
-            for (let i = 0; i < preRequirements[0].length; i++) {
-                
+            for (let i = 0; i < preRequirements[0].length; i++) {                
                 data.push(
                     {
                         id: BigNumber.from(preRequirements[0][i]).toNumber(),

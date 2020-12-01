@@ -25,9 +25,7 @@ router.post('/createStep', async (req, res, next) => {
 
         // 2. BUILDING STEP
         const step = {
-            applicationId: req.body.applicationId,
-            opportunityId: req.body.opportunityId,
-            value: req.body.value
+            data: req.body.value
         };
 
         // // 3. BUILDING METADA
@@ -50,7 +48,7 @@ router.post('/createStep', async (req, res, next) => {
             akasifyConfig,
             {
                 // ...and Akasify is flagged as the dataset's creator.
-                creator: akasifyIdentity,
+                creator: akasifyIdentity
             },
         );
 
@@ -73,7 +71,7 @@ router.post('/getStep', async (req, res, next) => {
     try {
 
         // 1. GET THE DATASET ADDRESS
-        const datasetAddress = new Parcel.Address( req.body.address );
+        const datasetAddress = new Parcel.Address( req.body.datasetAddress );
 
         // 2. CONNECT TO DATASET
         const datasetToDownload = await Parcel.Dataset.connect(datasetAddress, akasifyIdentity, akasifyConfig);
@@ -83,18 +81,19 @@ router.post('/getStep', async (req, res, next) => {
 
         // 4. CREATE FILE
         const secretDatasetWriter = secretDataStream.pipe(
-            require('fs').createWriteStream('./user_data'),
+            require('fs').createWriteStream('./dataset_data'),
         );
 
         // 5. UTILITY METHOD
-        const streamFinished = require('util').promisify(require('stream').finished);    
+        const streamFinished = require('util').promisify(require('stream').finished);
+    
         await streamFinished(secretDatasetWriter);
 
         // 6. READ FILE
-        const secretData = require('fs').readFileSync('./user_data').toString();
+        const secretData = require('fs').readFileSync('./dataset_data').toString();
 
         res.json({
-            datasetData: secretData
+            datasetData: secretData.data
         });
 
     } catch (err) {

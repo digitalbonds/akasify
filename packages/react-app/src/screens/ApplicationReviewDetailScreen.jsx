@@ -154,7 +154,11 @@ function ApplicationReviewDetailScreen({
   }
 
   const approveOrReject = (decision) => {
-
+    if (decision) {
+        tx(writeContracts.AkasifyCoreContract.updateApplicationStatus(appId, 3));
+    } else {
+        tx(writeContracts.AkasifyCoreContract.updateApplicationStatus(appId, 4));
+    }    
   }
 
   const preRequirementData = () => {
@@ -214,7 +218,11 @@ function ApplicationReviewDetailScreen({
       for (let i = 0; i < preAccomplishments[0].length; i++) {
         let aT = "";
         let datasetAddress = "";
-        aT = preAccomplishments[4][i];
+        if (BigNumber.from(preAccomplishments[3][i]).toNumber() == 1) {
+            aT = "step initiated automatically by smart contract";
+          } else {
+            aT = preAccomplishments[4][i];
+          }
         if (BigNumber.from(preAccomplishments[3][i]).toNumber() == 2) {
           datasetAddress = preAccomplishments[4][i];
         }
@@ -313,6 +321,7 @@ function ApplicationReviewDetailScreen({
                     <Button
                         type="primary"
                         block
+                        disabled={ appStatus == 3 ? true : false }
                         onClick={()=>{
                             approveOrReject(true)
                         }}>
@@ -323,6 +332,7 @@ function ApplicationReviewDetailScreen({
                     <Button
                         type="primary"
                         block
+                        disabled={ appStatus == 4 ? true : false }
                         onClick={() => {
                             approveOrReject(false)
                         }}>Reject</Button>

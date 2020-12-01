@@ -65,12 +65,9 @@ function OpportunityDetailScreen({
   // SMART CONTRACT HOOKS
   const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
   const application = useContractReader(readContracts, 'AkasifyCoreContract', "getApplication", [id.replace(":",""), address]);
-  //console.log("application: ", application);
   const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
-  //console.log("pre requirements: ", preRequirements);
   //const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
   const preAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPreAccomplishmentsByApplicationId', [appId]);
-  //console.log("pre accomplishments: ", preAccomplishments);
   //const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);  
 
   // SMART CONTRACT BROADCAST
@@ -115,9 +112,7 @@ function OpportunityDetailScreen({
 
   const currentPreRequirement = () => {
     if (preAccomplishments && preAccomplishments.length > 0 && preAccomplishments[0].length > 0) {
-      //console.log("step 2, ", preAccomplishments);
       if (BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber()) {
-        //console.log("step 3");
         if (BigNumber.from(preAccomplishments[3][preAccomplishments[3].length - 1]).toNumber() == 1) {
           // PRE REQUIREMENT INITIATED
           return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber();
@@ -205,22 +200,7 @@ function OpportunityDetailScreen({
     {
       title: 'Type',
       key: 'tags',
-      dataIndex: 'tags',
-      // render: tags => (
-      //   <span>
-      //     {tags.map(tag => {
-      //       let color = tag.length > 5 ? 'geekblue' : 'green';
-      //       //if (tag === 'loser') {
-      //       //  color = 'volcano';
-      //       //}
-      //       return (
-      //         <Tag color={color} key={tag}>
-      //           {tag.toUpperCase()}
-      //         </Tag>
-      //       );
-      //     })}
-      //   </span>
-      // ),
+      dataIndex: 'tags'
     }
   ];
   
@@ -256,12 +236,6 @@ function OpportunityDetailScreen({
     background: '#364d79',
   };
 
-  const tags = (data) => (
-    data.map(tag => (
-        <Tag key={tag}>{tag}</Tag>
-    ))
-  );
-
   return (
     <Layout className="site-layout">
       <Card
@@ -292,14 +266,6 @@ function OpportunityDetailScreen({
                   {opportunity && moment.unix(opportunity[3]).format(dateFormat)}
                 </Col>
               </Row>
-              <Row justify="space-between">
-                <Col span={2}>
-                  <Tooltip placement="left" title="tags">
-                    <TagOutlined />
-                  </Tooltip>
-                </Col>
-                {/* <Col span={22}>{tags(opportunityData.tags)}</Col> */}
-              </Row>
               <Divider />
               <Row justify="space-between">
                 <Col span={24}>{opportunity && opportunity[2]}</Col>
@@ -307,6 +273,27 @@ function OpportunityDetailScreen({
               <Divider />
               <Row justify="center">
                 <Col span={12}>
+                  { role === "beneficiary" && application && application[0].length > 0 && 
+                    <Result
+                      status={ appStatus === 3 ? "success" : "error" }
+                      title={ appStatus == 3 ? "Congratulations" : "Sorry" }
+                      subTitle={appStatus == 3 ? "Your application has been approved!" : "You application wasn't selected this time."}
+                    >
+                      <div className="desc">
+                          <Paragraph>
+                              <Text
+                              strong
+                              style={{
+                                  fontSize: 16,
+                              }}
+                              >
+                                { appStatus == 3 ? 
+                                  "Please keep an eye on your email, the organization will contact you for the opportunity proccess." : "There are more opportunities to apply, continue doing good for social good."}
+                              </Text>
+                          </Paragraph>
+                      </div>
+                    </Result>
+                  }
                   { role === "beneficiary" && <Button
                       type="primary"
                       block
