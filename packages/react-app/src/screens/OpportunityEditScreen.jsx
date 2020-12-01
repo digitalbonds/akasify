@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select, Upload, Modal } from 'antd';
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select, Upload, Modal } from "antd";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useParams, useHistory } from "react-router-dom";
 import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
-import moment from 'moment';
-import { useTranslation } from 'react-i18next'
-import { BigNumber } from '@ethersproject/bignumber'
+import moment from "moment";
+import { useTranslation } from "react-i18next";
+import { BigNumber } from "@ethersproject/bignumber";
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -58,7 +58,6 @@ function OpportunityEditScreen ({
             setOppStatus(BigNumber.from(opportunity[7]).toNumber());
         }
     }, [opportunity]);
-
 
     const [oppForm] = Form.useForm();
     const [preRequirementForm] = Form.useForm();
@@ -171,8 +170,6 @@ function OpportunityEditScreen ({
     const postRequirementData = [];
 
     const onOppCreate = () => {
-        console.log("opportunity pre req, ", oppPreRequirementDeadline);
-        console.log("opportunity post req, ", oppPosRequirementDeadline);
         tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));        
     };
 
@@ -224,7 +221,6 @@ function OpportunityEditScreen ({
             console.log("pre id: ", BigNumber.from(preRequirements[0][preRow]).toNumber());
             console.log("pre type: ", BigNumber.from(preRequirements[1][preRow]).toNumber());
             setPreId(BigNumber.from(preRequirements[0][preRow]).toNumber());
-            //setPreType(BigNumber.from(preRequirements[1][preRow]).toNumber());
             setPreType(2);
             setPreValue(BigNumber.from(preRequirements[2][preRow]).toNumber());            
             setPreName(preRequirements[3][preRow]);

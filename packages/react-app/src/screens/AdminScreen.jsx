@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Table, Layout, Space, Typography, Form, Input, Button, Tag } from 'antd';
-import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
-import { Transactor } from "../helpers";
-import opportunityAvatar from '../assets/images/opportunity_avatar.png'
-import opportunityImage from '../assets/images/opportunity_detail.png'
-import moment from 'moment';
-import { useTranslation } from 'react-i18next'
-import { BigNumber } from '@ethersproject/bignumber'
-const { Title, Paragraph, Text } = Typography;
+import React, { useState } from "react";
+import { Row, Col, Table, Layout, Typography, Form, Input, Button } from "antd";
+import { useContractLoader, useContractReader } from "../hooks";
+import { useTranslation } from "react-i18next";
+import { BigNumber } from "@ethersproject/bignumber";
 
-const { Meta } = Card;
+const { Title } = Typography;
 
 function AdminScreen ({
   address,
@@ -19,39 +14,18 @@ function AdminScreen ({
   mainnetProvider,
   tx
 }) {
-    //console.log("local provider ", localProvider);
-    // The transactor wraps transactions and provides notificiations
-    //const tx = Transactor(userProvider, gasPrice);
-
-    // Load in your local 📝 contract and read a value from it:
+    
     const readContracts = useContractLoader(localProvider);
-    //console.log("read contracts ", readContracts);
-
-    // If you want to make 🔐 write transactions to your contracts, use the userProvider:
-    const writeContracts = useContractLoader(userProvider)
-    //console.log("🔐 writeContracts",writeContracts)
-
-    //const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
-    //console.log("🤗 opportunities:", opportunities);
+    const writeContracts = useContractLoader(userProvider);
 
     const organizations = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizations");
-    console.log("🤗 organizations:", organizations);
-
     const beneficiaries = useContractReader(readContracts, 'AkasifyCoreContract', "getBeneficiaries");
-    //console.log("🤗 beneficiaries:", beneficiaries);    
-
-    if (beneficiaries) {
-        let test = beneficiaries[0][0];
-        //console.log("value test ", test);
-        //console.log("big int value test ", BigNumber.from(test));
-    }    
 
     const [orgForm] = Form.useForm();
-    const [benForm] = Form.useForm();
-
     const [orgName, setOrgName] = useState("");
     const [orgAccount, setOrgAccount] = useState("");
-
+    
+    const [benForm] = Form.useForm();
     const [benAccount, setBenAccount] = useState("");
 
     const orgColumns = [
@@ -67,41 +41,11 @@ function AdminScreen ({
             key: 'account',
         },
         {
-            title: 'Action',
-            key: 'action',
-            render: () => (
-                <Space size="middle">
-                    <a>Delete</a>
-                </Space>
-            ),
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
         },
     ];
-
-    const benStatus = (status) => {
-        let color = 'gray';
-        let statusText = 'none';
-        switch (status) {
-            case 1:
-                color = 'gray';
-                statusText = 'pending';
-                break;
-            case 2:
-                color = 'red';
-                statusText = 'rejected';
-                break;
-            case 1:
-                color = 'green';
-                statusText = 'valid';
-                break;
-            default:
-                break;
-        }
-        return (
-            <Tag color={color} key={status}>
-            {   statusText.toUpperCase()}
-            </Tag>
-        )
-    }
 
     const benColumns = [
         {
@@ -113,44 +57,41 @@ function AdminScreen ({
             title: 'Status',
             key: 'status',
             dataIndex: 'status',
-            render: status => (
-              <span>
-                  <Tag color={'gray'} key={BigNumber.from(status).toNumber()}>
-                    {BigNumber.from(status).toNumber()}
-                </Tag>
-              </span>
-            ),
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: () => (
-                <Space size="middle">
-                    <a>Delete</a>
-                </Space>
-            ),
         }
     ];
 
-    const orgData = () => {    
-        //console.log('accessing org data: ', organizations);    
+    const orgData = () => {     
         let data = [];
         if (organizations) {
             for (let i = 0; i < organizations[0].length; i++) {
+                let status = "";
+                switch (BigNumber.from(organizations[4][i]).toNumber()) {
+                    case 1:
+                        status = "waiting for approval";
+                        break;
+                    case 2:
+                        status = "deactivated";
+                        break;
+                    case 3:
+                        status = "active";
+                        break;
+                    default:
+                        status = "";
+                        break;
+                }
                 data.push({
-                    id: 0,
+                    id: BigNumber.from(organizations[0][i]).toNumber(),
+                    key: BigNumber.from(organizations[0][i]).toNumber(),
                     name: organizations[1][i],
-                    account: organizations[2][i]
+                    account: organizations[2][i],
+                    status: status
                 });
             }   
         }        
         return data;
     }
 
-    //console.log('org data test', orgData());
-
     const benData = () => {
-        //console.log('accessing ben data');    
         let data = [];
         if (beneficiaries) {
             for (let i = 0; i < beneficiaries[0].length; i++) {
@@ -164,16 +105,11 @@ function AdminScreen ({
         return data;
     }
 
-    //console.log('ben data: ', benData());
-
     const onOrgFinish = () => {
-        //console.log(orgName);
-        //console.log(orgAccount);
         tx(writeContracts.AkasifyCoreContract.registerOrganizationByAdmin(orgName, orgAccount, 3));
     };
 
     const onBenFinish = () => {
-        console.log('ben account ', benAccount);
         tx(writeContracts['AkasifyCoreContract'].registerBeneficiaryByAdmin(benAccount, 3));
     };
 

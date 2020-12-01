@@ -31,6 +31,7 @@ contract AkasifyCoreContract {
         uint postRequirementsDeadline;
         uint creationDate;
         uint lastUpdate;
+        uint applicationCount;
         uint status;
         //1. draft
         //2. open to applications
@@ -319,6 +320,9 @@ contract AkasifyCoreContract {
         applications[nextApplicationId].lastUpdate = block.timestamp;
         applications[nextApplicationId].status = 1;
 
+        //Increment application count in the opportunity
+        opportunities[opportunityId].applicationCount++;
+
         Accomplishment memory _accomplishment;
         _accomplishment.id = 0;
         _accomplishment.requirementId = 0;
@@ -432,6 +436,32 @@ contract AkasifyCoreContract {
         }
         
         return (_application.id, _application.opportunityId, _application.beneficiaryId, _application.creationDate, _application.lastUpdate, _application.status);
+    }
+
+    function getApplicationsByOpportunityId(uint opportunityId) 
+        public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, uint[] memory) {
+
+        Opportunity storage _opportunity = opportunities[opportunityId];
+        uint[] memory appIds = new uint[](_opportunity.applicationCount);
+        uint[] memory appBeneficiaryIds = new uint[](_opportunity.applicationCount);
+        uint[] memory appCreationDates = new uint[](_opportunity.applicationCount);
+        uint[] memory appLastUpdates = new uint[](_opportunity.applicationCount);
+        uint[] memory appStatus = new uint[](_opportunity.applicationCount);
+
+        uint appCount = 0;
+        for (uint i = 0; i < nextApplicationId; i++) {
+            Application memory _application = applications[i];            
+            if (_application.opportunityId == opportunityId) {
+                appIds[appCount] = _application.id;
+                appBeneficiaryIds[appCount] = _application.beneficiaryId;
+                appCreationDates[appCount] = _application.creationDate;
+                appLastUpdates[appCount] = _application.lastUpdate;
+                appStatus[appCount] = _application.status;
+                appCount++;
+            }
+        }
+        
+        return (appIds, appBeneficiaryIds, appCreationDates, appLastUpdates, appStatus);
 
     }
 
@@ -478,19 +508,27 @@ contract AkasifyCoreContract {
         public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, string[] memory) {
 
         Application storage _application = applications[applicationId];
-        uint[] memory preAccomplishmentIds = new uint[](_application.nextPreAccomplishmentId);
-        uint[] memory preRequirementIds = new uint[](_application.nextPreAccomplishmentId);
-        uint[] memory preAccomplishDates = new uint[](_application.nextPreAccomplishmentId);
-        uint[] memory preAccomplishCategories = new uint[](_application.nextPreAccomplishmentId);
-        string[] memory preAccomplishValues = new string[](_application.nextPreAccomplishmentId);
+        uint[] memory preAccomplishmentIds = new uint[](_application.preAccomplishments.length);
+        uint[] memory preRequirementIds = new uint[](_application.preAccomplishments.length);
+        uint[] memory preAccomplishDates = new uint[](_application.preAccomplishments.length);
+        uint[] memory preAccomplishCategories = new uint[](_application.preAccomplishments.length);
+        string[] memory preAccomplishValues = new string[](_application.preAccomplishments.length);
         
-        for (uint i = 0; i < _application.nextPreAccomplishmentId; i++) {
+        for (uint i = 0; i < _application.preAccomplishments.length; i++) {
             Accomplishment memory _accomplishment = _application.preAccomplishments[i];
             preAccomplishmentIds[i] = _accomplishment.id;
             preRequirementIds[i] = _accomplishment.requirementId;
             preAccomplishDates[i] = _accomplishment.accomplishDate;
             preAccomplishCategories[i] = _accomplishment.accomplishCategory;
             preAccomplishValues[i] = _accomplishment.accomplishValue;
+        }
+        if (_application.preAccomplishments.length > _application.nextPreAccomplishmentId) {
+            Accomplishment memory _accomplishment = _application.preAccomplishments[_application.nextPreAccomplishmentId];
+            preAccomplishmentIds[_application.nextPreAccomplishmentId] = _accomplishment.id;
+            preRequirementIds[_application.nextPreAccomplishmentId] = _accomplishment.requirementId;
+            preAccomplishDates[_application.nextPreAccomplishmentId] = _accomplishment.accomplishDate;
+            preAccomplishCategories[_application.nextPreAccomplishmentId] = _accomplishment.accomplishCategory;
+            preAccomplishValues[_application.nextPreAccomplishmentId] = _accomplishment.accomplishValue;
         }
         return (preAccomplishmentIds, preRequirementIds, preAccomplishDates, preAccomplishCategories, preAccomplishValues);
     }
@@ -547,7 +585,7 @@ contract AkasifyCoreContract {
             )
         );
 
-        //validating if the opportunity related to this opportunity has more steps        
+        //validating if the opportunity related to this opportunity has more steps
         if (opportunities[applications[applicationId].opportunityId].nextPreRequirementId > (applications[applicationId].nextPreRequirementId + 1)) {
             
             //incrementing pre accomplishment id for application
@@ -567,11 +605,13 @@ contract AkasifyCoreContract {
                 )
             );
 
+            //RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
+
             //incrementing pre accomplishment id for application
             applications[applicationId].nextPreAccomplishmentId++;
-            RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId - 1, applications[applicationId].nextPreRequirementId - 1, applicationId, applications[applicationId].opportunityId);
+            //RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId - 1, applications[applicationId].nextPreRequirementId - 1, applicationId, applications[applicationId].opportunityId);
         } else {
-            RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
+            //RegisterApplicationPreAccomplishment(applications[applicationId].nextPreAccomplishmentId, applications[applicationId].nextPreRequirementId, applicationId, applications[applicationId].opportunityId);
             applications[applicationId].status = 2;
         }        
     }

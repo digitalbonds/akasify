@@ -1,7 +1,7 @@
-import React from 'react';
-import { Layout, Typography, Button, Result, Steps } from 'antd';
-import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom';
+import React from "react";
+import { Layout, Typography, Button, Result, Steps } from "antd";
+import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router-dom";
 const { Paragraph, Text } = Typography;
 
 const { Step } = Steps;

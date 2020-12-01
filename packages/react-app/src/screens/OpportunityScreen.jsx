@@ -1,13 +1,13 @@
-import React from 'react';
-import { Row, Col, Tag, Badge, Card, Avatar, List, Layout, Tooltip, Button } from 'antd';
-import { EyeOutlined, CalendarOutlined, FormOutlined, StarOutlined, TagOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { NavLink } from 'react-router-dom'
+import React from "react";
+import { Row, Col, Tag, Badge, Card, Avatar, List, Layout, Tooltip, Button } from "antd";
+import { EyeOutlined, CalendarOutlined, FormOutlined, StarOutlined, TagOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { NavLink } from "react-router-dom";
 import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
-import opportunityAvatar from '../assets/images/opportunity_avatar.png'
-import opportunityImage from '../assets/images/opportunity_detail.png'
-import moment from 'moment';
-import { BigNumber } from '@ethersproject/bignumber'
-import { useTranslation } from 'react-i18next'
+import opportunityAvatar from "../assets/images/opportunity_avatar.png";
+import opportunityImage from "../assets/images/opportunity_detail.png";
+import moment from "moment";
+import { BigNumber } from "@ethersproject/bignumber";
+import { useTranslation } from "react-i18next";
 
 const { Meta } = Card;
 
@@ -19,15 +19,11 @@ function OpportunityScreen ({
   mainnetProvider,
   role
 }) {
-  //console.log("local provider ", localProvider);
-
-  // Load in your local 📝 contract and read a value from it:
+  
   const readContracts = useContractLoader(localProvider);
-  //console.log("read contracts ", readContracts);
   const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
-  //console.log("🤗 opportunities:", opportunities);
     
-  const length = 250;
+  const length = 250; // description max characters to show in preview
 
   const oppData = () => {
     let data = [];
@@ -47,7 +43,6 @@ function OpportunityScreen ({
             });
         }   
     }
-    //console.log('accessing opportunities ', data);     
     return data;
 }
 
@@ -132,7 +127,7 @@ function OpportunityScreen ({
               marginBottom: 20
             }}>
               <div></div>
-              {role == "organization" && (
+              {role === "organization" && (
                 <div>
                   <Button
                     type="primary"
@@ -169,7 +164,7 @@ function OpportunityScreen ({
               >
                 <Meta
                   avatar={<Avatar src={item.avatar} />}
-                  title={ <NavLink to={ role == "organization" ? `/opportunityedit:${item.id}` : `/opportunity:${item.id}`}>{item.name}</NavLink>}
+                  title={ <NavLink to={ role === "organization" ? `/opportunityedit:${item.id}` : `/opportunity:${item.id}`}>{item.name}</NavLink>}
                   description={
                     <div className="opportunity-detail-card">
                       <Row justify="space-between">

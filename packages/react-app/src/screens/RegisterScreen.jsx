@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { Row, Col, Layout, Typography, Form, Input, Button } from 'antd';
+import { Row, Col, Layout, Typography, Form, Input, Button } from "antd";
 import { useContractLoader, useEventListener } from "../hooks";
-import { useEffect } from 'react';
-const { Title, Paragraph, Text } = Typography;
 
+const { Title, Paragraph, Text } = Typography;
 
 function RegisterScreen ({
   address,
@@ -17,8 +16,8 @@ function RegisterScreen ({
     const readContracts = useContractLoader(localProvider);
     const writeContracts = useContractLoader(userProvider);
 
-    //📟 Listen for broadcast beneficiary events
-  const setBeneficiaryEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterBeneficiary", localProvider, 1);
+    //Listen for broadcast beneficiary events
+    const setBeneficiaryEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterBeneficiary", localProvider, 1);
 
     const [benForm] = Form.useForm();
 

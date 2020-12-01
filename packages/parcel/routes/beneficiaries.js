@@ -87,8 +87,7 @@ router.post('/getStep', async (req, res, next) => {
         );
 
         // 5. UTILITY METHOD
-        const streamFinished = require('util').promisify(require('stream').finished);
-    
+        const streamFinished = require('util').promisify(require('stream').finished);    
         await streamFinished(secretDatasetWriter);
 
         // 6. READ FILE

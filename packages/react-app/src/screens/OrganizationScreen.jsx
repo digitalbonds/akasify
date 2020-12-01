@@ -1,9 +1,9 @@
-import React from 'react';
-import { Row, Col, Tag, Avatar, List, Layout, Space, Statistic } from 'antd';
-import { CalendarOutlined, FormOutlined } from '@ant-design/icons';
-import opportunityAvatar from '../assets/images/opportunity_avatar.png'
-import opportunityImage from '../assets/images/opportunity_detail.png'
-import moment from 'moment';
+import React from "react";
+import { Row, Col, Tag, Avatar, List, Layout, Space, Statistic } from "antd";
+import { CalendarOutlined, FormOutlined } from "@ant-design/icons";
+import opportunityAvatar from "../assets/images/opportunity_avatar.png";
+import opportunityImage from "../assets/images/opportunity_detail.png";
+import moment from "moment";
 
 function OrganizationScreen ({
   show,

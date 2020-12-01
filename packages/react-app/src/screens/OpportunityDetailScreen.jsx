@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useHistory, Redirect } from "react-router-dom"
-import { Button, Layout, Row, Typography, Col, Card, Avatar, Tabs, Tag, Table, Carousel, Tooltip, Badge, Divider, Steps, Form, Input, Modal } from 'antd'
-import { CalendarOutlined, LoadingOutlined, TagOutlined, FileProtectOutlined, DatabaseOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next'
+import React, { useState, useEffect } from "react";
+import { useParams, useHistory } from "react-router-dom";
+import { Button, Layout, Row, Typography, Col, Card, Avatar, Tabs, Tag, Table, Carousel, Tooltip, Badge, Divider, Steps, Form, Input, Modal } from "antd";
+import { CalendarOutlined, LoadingOutlined, TagOutlined, FileProtectOutlined, DatabaseOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import { useContractLoader, useContractReader, useBalance, useEventListener, useExchangePrice } from "../hooks";
 import { Transactor } from "../helpers";
-import opportunityAvatar from '../assets/images/opportunity_avatar.png'
-import * as moment from 'moment'
-import { BigNumber } from '@ethersproject/bignumber'
-import { parcelConfig } from '../helpers/parcelConfig';
-import { OidcClient, Log } from 'oidc-client';
-import oasisLogo from '../assets/images/oasis_logo.png';
+import opportunityAvatar from "../assets/images/opportunity_avatar.png";
+import * as moment from "moment";
+import { BigNumber } from "@ethersproject/bignumber";
+import { parcelConfig } from "../helpers/parcelConfig";
+import { OidcClient, Log } from "oidc-client";
+import oasisLogo from "../assets/images/oasis_logo.png";
 
-const { Header, Content, Footer } = Layout;
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 const { Meta } = Card;
-const { Paragraph, Title } = Typography;
+const { Paragraph } = Typography;
 const { Step } = Steps;
 
 function OpportunityDetailScreen({
@@ -32,6 +31,7 @@ function OpportunityDetailScreen({
   let history = useHistory();
   const { t } = useTranslation();
   const akasifyOasisAppId = "ce904c3e-ddca-4783-8241-b2a2ae7602f3";
+  const parcelUrlAPI = "http://localhost:5000";
 
   const readContracts = useContractLoader(localProvider);
   const writeContracts = useContractLoader(userProvider);
@@ -70,7 +70,7 @@ function OpportunityDetailScreen({
   //console.log("pre requirements: ", preRequirements);
   //const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
   const preAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPreAccomplishmentsByApplicationId', [appId]);
-  //console.log("pre accomplishments: ", preAccomplishments);
+  console.log("pre accomplishments: ", preAccomplishments);
   //const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);  
 
   // SMART CONTRACT BROADCAST
@@ -107,7 +107,6 @@ function OpportunityDetailScreen({
   const obtainIdToken = async () => {
     localStorage.setItem('akasify-oasis-previous', history.location.pathname);
     const request = await oidcClient.createSigninRequest();
-    //localStorage.setItem('akasify-request-url', request.url);
     window.location.assign(request.url);
   };
 
@@ -123,25 +122,25 @@ function OpportunityDetailScreen({
   };
 
   const currentPreRequirement = () => {
-    if (preAccomplishments && preAccomplishments.length > 0) {
+    if (preAccomplishments && preAccomplishments.length > 0 && preAccomplishments[0].length > 0) {
       //console.log("step 2, ", preAccomplishments);
-      // if (BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber()) {
-      //   //console.log("step 3");
-      //   if (BigNumber.from(preAccomplishments[3][preAccomplishments[3].length - 1]).toNumber() == 1) {
-      //     // PRE REQUIREMENT INITIATED
-      //     return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber();
-      //   } else {
-      //     // PRE REQUIREMENT FINALIZED
-      //     return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber() + 1;
-      //   }
-      // }
+      if (BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber()) {
+        //console.log("step 3");
+        if (BigNumber.from(preAccomplishments[3][preAccomplishments[3].length - 1]).toNumber() == 1) {
+          // PRE REQUIREMENT INITIATED
+          return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber();
+        } else {
+          // PRE REQUIREMENT FINALIZED
+          return BigNumber.from(preAccomplishments[1][preAccomplishments[1].length - 1]).toNumber() + 1;
+        }
+      }
     }
     return 0;
   }
 
   const uploadData = async () => {
     console.log("api token: ", localStorage.getItem('akasify-oasis-token'));
-    const response = await fetch('http://localhost:5000/beneficiaries/createStep', {
+    const response = await fetch(`${parcelUrlAPI}/beneficiaries/createStep`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

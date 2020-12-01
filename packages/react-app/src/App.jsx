@@ -11,34 +11,23 @@ import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useC
 import { HeaderComponent, Account, Faucet, Ramp, Contract, GasGauge, Address } from "./components";
 import { Transactor } from "./helpers";
 import { parseEther, formatEther } from "@ethersproject/units";
-//import Hints from "./Hints";
-import { Hints, ExampleUI, Subgraph } from "./views"
-
-import { ReactComponent as Logo } from './assets/vectors/akasify_icon.svg';
-import CallbackScreen from './screens/CallbackScreen'
-import RegisterScreen from './screens/RegisterScreen'
-import RegisterSucessScreen from './screens/RegisterSucessScreen'
-import HomeScreen from './screens/HomeScreen'
-import ApplicationScreen from './screens/ApplicationScreen'
-import OpportunityScreen from './screens/OpportunityScreen'
-import OpportunityDetailScreen from './screens/OpportunityDetailScreen'
-import OpportunityEditScreen from './screens/OpportunityEditScreen'
-import OrganizationScreen from './screens/OrganizationScreen'
-import ProfileScreen from './screens/ProfileScreen'
-import BeneficiaryScreen from './screens/BeneficiaryScreen'
-import AdminScreen from './screens/AdminScreen'
-import ProfileDrawer from './components/ProfileDrawer'
-import '../../../packages/react-app/src/i18n'
+import { ReactComponent as Logo } from "./assets/vectors/akasify_icon.svg";
+import CallbackScreen from "./screens/CallbackScreen";
+import RegisterScreen from "./screens/RegisterScreen";
+import RegisterSucessScreen from "./screens/RegisterSucessScreen";
+import HomeScreen from "./screens/HomeScreen";
+import ApplicationReviewScreen from "./screens/ApplicationReviewScreen";
+//import ApplicationReviewDetailScreen from "./screens/ApplicationReviewDetailScreen";
+import OpportunityScreen from "./screens/OpportunityScreen";
+import OpportunityDetailScreen from "./screens/OpportunityDetailScreen";
+import OpportunityEditScreen from "./screens/OpportunityEditScreen";
+import OrganizationScreen from "./screens/OrganizationScreen";
+import ProfileScreen from "./screens/ProfileScreen";
+import BeneficiaryScreen from "./screens/BeneficiaryScreen";
+import AdminScreen from "./screens/AdminScreen";
+import ProfileDrawer from "./components/ProfileDrawer";
+import "../../../packages/react-app/src/i18n";
 /*
-    Welcome to 🏗 scaffold-eth !
-
-    Code:
-    https://github.com/austintgriffith/scaffold-eth
-
-    Support:
-    https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA
-    or DM @austingriffith on twitter or telegram
-
     You should get your own Infura.io ID and put it in `constants.js`
     (this is your connection to the main Ethereum network for ENS etc.)
 */
@@ -64,19 +53,16 @@ const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REA
 if(DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 
-
-
 function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
+
   /* 💵 this hook will get the price of ETH from 🦄 Uniswap: */
   const price = useExchangePrice(mainnetProvider); //1 for xdai
 
   /* 🔥 this hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice("fast"); //1000000000 for xdai
-
-  // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
@@ -85,7 +71,6 @@ function App(props) {
   // The transactor wraps transactions and provides notificiations
   const tx = Transactor(userProvider, gasPrice)
 
-  // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
   if(DEBUG) console.log("💵 yourLocalBalance",yourLocalBalance?formatEther(yourLocalBalance):"...")
 
@@ -99,13 +84,8 @@ function App(props) {
 
   // Get the role to manage access control
   const role = useContractReader(readContracts, 'AkasifyCoreContract', "getRole", [address]);
-  //console.log("user role: ", role);
-  //console.log("user role: ", role);
 
-  // If you want to make 🔐 write transactions to your contracts, use the userProvider:
-  const writeContracts = useContractLoader(userProvider)
-  if(DEBUG) console.log("🔐 writeContracts",writeContracts)
-
+  const writeContracts = useContractLoader(userProvider);
 
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
@@ -144,7 +124,8 @@ function App(props) {
               logoutOfWeb3Modal={logoutOfWeb3Modal}
             />
             <Switch>
-            <Route path='/applications:opportunityId' render={() => <ApplicationScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
+              {/* <Route path='/applicationdetail:applicationId' render={() => <ApplicationReviewDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/> */}
+              <Route path='/applications:opportunityId' render={() => <ApplicationReviewScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/opportunityedit:id' render={() => <OpportunityEditScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
