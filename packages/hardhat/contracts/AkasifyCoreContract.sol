@@ -227,9 +227,9 @@ contract AkasifyCoreContract {
     }
 
     function getBeneficiaryById(uint _id)
-        public view returns(uint, address, uint, uint) {
+        public view returns(uint, address, string memory, uint, uint) {
         Beneficiary memory _beneficiary = beneficiaries[_id];
-        return (_beneficiary.id, _beneficiary.account, _beneficiary.registerDate, _beneficiary.status); 
+        return (_beneficiary.id, _beneficiary.account, _beneficiary.oasisAddress, _beneficiary.registerDate, _beneficiary.status); 
     }
 
     function getBeneficiaryByAddress(address _account)

@@ -31,11 +31,20 @@ function OpportunityEditScreen ({
 
     let { id } = useParams();
     let history = useHistory();
+    const dateFormat = 'MM/DD/YYYY';
 
     const readContracts = useContractLoader(localProvider);
     const writeContracts = useContractLoader(userProvider);
 
     const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
+    
+    // console.log("opportunity data: ", opportunity);
+    //console.log("opportunity pre requirement: ", opportunity && BigNumber.from(opportunity[3]).toNumber());
+    // console.log("opportunity pre requirement moment date: ", opportunity && moment(BigNumber.from(opportunity[3]).toNumber()).format("YYYY-MM-DD"));
+    //console.log("opportunity pre requirement moment date: ", opportunity && moment(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat));
+    //console.log("opportunity created pre requirement deadline date YYYY-MM-DD: ", opportunity && moment.unix(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat));
+    //console.log("opportunity pre requirement moment date: ", opportunity && moment.unix(BigNumber.from(opportunity[3]).toNumber()).format("YYYY-MM-DD"));
+    
     const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", id.replace(":",""));
     const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
     const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));
@@ -120,7 +129,7 @@ function OpportunityEditScreen ({
     const [postValue, setPostValue] = useState(0);
     const [postType, setPostType] = useState(0);
 
-    const preRequirementColumns = [
+    const requirementColumns = [
         {
           title: 'No.',
           dataIndex: 'id',
@@ -149,47 +158,34 @@ function OpportunityEditScreen ({
           ),
         }
     ];
-
-    const postRequirementColumns = [
-        {
-          title: 'No.',
-          dataIndex: 'id',
-          key: 'id',
-          render: text => <a>{text}</a>,
-        },
-        {
-          title: 'Name',
-          dataIndex: 'name',
-          key: 'name',
-        },
-        {
-            title: 'Value',
-            dataIndex: 'value',
-            key: 'value',
-          },
-        {
-          title: 'Type',
-          key: 'type',
-          dataIndex: 'type',
-          render: type => (
-            <span>
-                <Tag color={'gray'} key={type}>
-                    {type.toUpperCase()}
-                </Tag>
-            </span>
-          ),
-        }
-    ];
     
+    const requirementTypeText = (requirementTypeNumber) => {
+        let requirementType = "";
+        switch (requirementTypeNumber) {
+            case 1:
+                requirementType = "simple";
+                break;
+            case 2:
+                requirementType = "value required";
+                break;
+            case 3:
+                requirementType = "automatic transfer";
+                break;
+            default:
+                break;
+        }
+        return requirementType;
+    }
     const preRequirementData = () => {
         let data = [];
         if (preRequirements) {
             for (let i = 0; i < preRequirements[0].length; i++) {
+                
                 data.push(
                     {
                         id: BigNumber.from(preRequirements[0][i]).toNumber(),
                         key: BigNumber.from(preRequirements[0][i]).toNumber(),
-                        type: BigNumber.from(preRequirements[1][i]).toNumber(),
+                        type: requirementTypeText(BigNumber.from(preRequirements[1][i]).toNumber()),
                         value: BigNumber.from(preRequirements[2][i]).toNumber(),
                         name: preRequirements[3][i]
                     }
@@ -199,9 +195,31 @@ function OpportunityEditScreen ({
         return data;
     };
 
-    const postRequirementData = [];
+    const postRequirementData = () => {
+        let data = [];
+        if (postRequirements) {
+            for (let i = 0; i < postRequirements[0].length; i++) {                
+                data.push(
+                    {
+                        id: BigNumber.from(postRequirements[0][i]).toNumber(),
+                        key: BigNumber.from(postRequirements[0][i]).toNumber(),
+                        type: BigNumber.from(postRequirements[1][i]).toNumber(),
+                        value: BigNumber.from(postRequirements[2][i]).toNumber(),
+                        name: requirementTypeText(postRequirements[3][i])
+                    }
+                )
+            }
+        }
+        return data;
+    };
 
     const onOppCreate = () => {
+        // console.log("opportunity created pre requirement deadline number: ", oppPreRequirementDeadline);
+        // console.log("opportunity created pre requirement deadline date: ", moment.unix(oppPreRequirementDeadline));
+        // console.log("opportunity created pre requirement deadline date MM-DD-YYYY: ", moment.unix(oppPreRequirementDeadline).format(dateFormat));
+        // console.log("opportunity created post requirement deadline number: ", oppPosRequirementDeadline);
+        // console.log("opportunity created post requirement deadline date: ", moment.unix(oppPosRequirementDeadline));
+        // console.log("opportunity created post requirement deadline date MM-DD-YYYY: ", moment.unix(oppPosRequirementDeadline).format(dateFormat));
         tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));        
     };
 
@@ -241,23 +259,74 @@ function OpportunityEditScreen ({
     );
 
     const onSelectChange = (selectedRowKeys) => {
-        console.log('selectedRowKeys changed: ', selectedRowKeys[0]);
+        //console.log('selectedRowKeys changed: ', selectedRowKeys[0]);
         setPreRow(selectedRowKeys[0]);
-        console.log('preRow: ', preRow);
-        console.log('preRequirements: ', preRequirements);
+        //console.log('preRow: ', preRow);
+        //console.log('preRequirements: ', preRequirements);
 
         if (preRequirements) {
-            console.log("validating data");
-            console.log("pre data: ", preRequirements[0]);
-            console.log("pre row: ", preRow);
-            console.log("pre id: ", BigNumber.from(preRequirements[0][preRow]).toNumber());
-            console.log("pre type: ", BigNumber.from(preRequirements[1][preRow]).toNumber());
+            // console.log("validating data");
+            // console.log("pre data: ", preRequirements[0]);
+            // console.log("pre row: ", preRow);
+            // console.log("pre id: ", BigNumber.from(preRequirements[0][preRow]).toNumber());
+            // console.log("pre type: ", BigNumber.from(preRequirements[1][preRow]).toNumber());
             setPreId(BigNumber.from(preRequirements[0][preRow]).toNumber());
             setPreType(2);
             setPreValue(BigNumber.from(preRequirements[2][preRow]).toNumber());            
             setPreName(preRequirements[3][preRow]);
         }        
     };
+
+    const getDataConverted = (unixTime) => {
+        //console.log("unix time received: ", unixTime);
+        
+        //let dateTime = moment.unix(unixTime);
+        // let dateTime;
+
+        // if (unixTime == 1609337804) {
+        //     console.log("access to 1");
+        //     dateTime = moment('2015/12/05', dateFormat);
+        // } else {
+        //     console.log("access to 2");
+        //     dateTime = moment('2015/12/07', dateFormat);
+        // }
+        //let  dateTime = moment('2015/12/05', dateFormat);
+        
+        //const dateTime = moment(unixTime).format(dateFormat);
+        //const dateTime2 = moment(unixTime);
+        //moment.unix(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat);
+        
+        //console.log("formatted date: ", dateTime.format(dateFormat));
+        //console.log("formatted date 2: ", dateTime2.format(dateFormat));
+
+        let dateTimeTest = moment.unix(unixTime);
+        let dateTimeText = dateTimeTest.format(dateFormat).toString();
+        //console.log("text time: ", dateTimeText);
+        let dateTimeFormatted = moment(dateTimeText, dateFormat);
+        return dateTimeFormatted;
+    }
+
+    const getPreRequirementConverted = (unixTime) => {
+        //console.log("unix time received: ", unixTime);
+        
+        //let dateTime = moment.unix(unixTime);
+        //let dateTime = moment('2015/12/07', dateFormat);
+        //let  dateTime = moment('2015/12/05', dateFormat);
+        
+        //const dateTime = moment(unixTime).format(dateFormat);
+        //const dateTime2 = moment(unixTime);
+        //moment.unix(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat);
+        
+        //console.log("formatted date: ", dateTime.format(dateFormat));
+        //console.log("formatted date 2: ", dateTime2.format(dateFormat));
+
+        let dateTimeTest = moment.unix(unixTime);
+        let dateTimeText = dateTimeTest.format(dateFormat).toString();
+        
+        let dateTimeFormatted = moment(moment.unix(unixTime).format("L"), dateFormat);
+        //console.log("pre requirement date: ", dateTimeFormatted);
+        return dateTimeFormatted;
+    }
 
     return (
         <Layout className="site-layout">
@@ -335,8 +404,8 @@ function OpportunityEditScreen ({
                             >
                                 <DatePicker
                                     disabled
-                                    format={"YYYY-MM-DD"}
-                                    defaultValue={ moment.unix(oppCreationDate) }
+                                    format={dateFormat}
+                                    defaultValue={ getDataConverted(oppCreationDate) }
                                     onChange={ (date) => { setOppCreationDate(moment(date).unix()) } }
                                 />
                             </Form.Item>
@@ -348,8 +417,8 @@ function OpportunityEditScreen ({
                                 valuePropName="opp-pre-requirement-deadline"
                             >
                                 <DatePicker
-                                    format={"YYYY-MM-DD"}
-                                    defaultValue={ moment.unix(oppPreRequirementDeadline) }
+                                    format={dateFormat}
+                                    defaultValue={ getPreRequirementConverted(oppPreRequirementDeadline) }
                                     onChange={ (date) => { setOppPreRequirementDeadline(moment(date).unix()) } }
                                 />
                             </Form.Item>
@@ -361,8 +430,8 @@ function OpportunityEditScreen ({
                                 valuePropName="opp-post-requirement-deadline"
                             >
                                 <DatePicker
-                                    format={"YYYY-MM-DD"}
-                                    defaultValue={ moment.unix(oppPosRequirementDeadline) }
+                                    format={dateFormat}
+                                    defaultValue={ getDataConverted(oppPosRequirementDeadline) }
                                     onChange={ (date) => { setOppPostRequirementDeadline(moment(date).unix()) } }
                                 />
                             </Form.Item>
@@ -375,8 +444,8 @@ function OpportunityEditScreen ({
                             >
                                 <DatePicker
                                     disabled
-                                    format={"YYYY-MM-DD"}
-                                    defaultValue={ moment.unix(oppLastUpdate) }
+                                    format={dateFormat}
+                                    defaultValue={ getDataConverted(oppLastUpdate) }
                                     onChange={ (date) => { setOppLastUpdate(moment(date).unix()) } }
                                 />
                             </Form.Item>
@@ -432,7 +501,7 @@ function OpportunityEditScreen ({
                                 preRow,
                                 onChange: onSelectChange,
                               }}
-                            columns={preRequirementColumns}
+                            columns={requirementColumns}
                             dataSource={preRequirementData()}
                         />
                         <Form
@@ -463,7 +532,7 @@ function OpportunityEditScreen ({
                                         <Select
                                             placeholder="Select a type"
                                             defaultValue={preType}
-                                            value={preType}
+                                            value={ preType == 0 ? 1 : preType }
                                             onChange={(value) => setPreType(value)}
                                             allowClear
                                         >
@@ -482,6 +551,7 @@ function OpportunityEditScreen ({
                                         <Input
                                             placeholder="0"
                                             value={preValue}
+                                            disabled={preType === 3 ? false : true }
                                             onChange={e => setPreValue(e.target.value)} />
                                     </Form.Item>
                                 </Col>
@@ -515,8 +585,8 @@ function OpportunityEditScreen ({
                     </TabPane>
                     <TabPane tab="Post requirements" key={2}>
                         <Table
-                            columns={postRequirementColumns}
-                            dataSource={postRequirementData}
+                            columns={requirementColumns}
+                            dataSource={postRequirementData()}
                         />
                         <Form
                             layout="vertical"

@@ -22,7 +22,8 @@ function OpportunityScreen ({
   
   const readContracts = useContractLoader(localProvider);
   const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
-    
+  
+  const dateFormat = 'MM/DD/YYYY';
   const length = 250; // description max characters to show in preview
 
   const oppData = () => {
@@ -171,7 +172,7 @@ function OpportunityScreen ({
                           </Tooltip>
                         </Col>
                         <Col span={22}>
-                          {moment.unix(item.preRequirementsDeadline).format("MM-DD-YYYY")}
+                          {moment.unix(item.preRequirementsDeadline).format(dateFormat)}
                         </Col>
                       </Row>
                       <Row justify="space-between">

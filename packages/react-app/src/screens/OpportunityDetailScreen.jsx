@@ -30,6 +30,7 @@ function OpportunityDetailScreen({
   const { t } = useTranslation();
   const akasifyOasisAppId = "ce904c3e-ddca-4783-8241-b2a2ae7602f3";
   const parcelUrlAPI = "http://localhost:5000";
+  const dateFormat = 'MM/DD/YYYY';
 
   const readContracts = useContractLoader(localProvider);
   const writeContracts = useContractLoader(userProvider);
@@ -288,7 +289,7 @@ function OpportunityDetailScreen({
                   </Tooltip>
                 </Col>
                 <Col span={22}>
-                  {opportunity && moment.unix(opportunity[4]).format("MM-DD-YYYY")}
+                  {opportunity && moment.unix(opportunity[3]).format(dateFormat)}
                 </Col>
               </Row>
               <Row justify="space-between">
