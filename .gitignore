@@ -7,6 +7,10 @@ packages/buidler/artifacts
 packages/react-app/src/contracts
 packages/buidler/cache
 
+#keys
+packages/hardhat/mnemonic.txt
+packages/hardhat/0x*
+
 # dependencies
 /node_modules
 /.pnp

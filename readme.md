@@ -6,8 +6,8 @@
 
 ## Resources
 
-* [Pitch]()
-* [Demo](https://youtu.be/_4OSDec_gs4)
+* [Pitch](https://youtu.be/sug8reOlwJA)
+* [Demo Parcel](https://youtu.be/_4OSDec_gs4)
 
 ## Featured Technology
 
