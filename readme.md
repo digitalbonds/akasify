@@ -7,7 +7,7 @@
 ## Resources
 
 * [Pitch]()
-* [Demo]()
+* [Demo](https://youtu.be/_4OSDec_gs4)
 
 ## Attributions
 

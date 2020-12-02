@@ -3,8 +3,6 @@ pragma solidity >=0.6.6;
 pragma experimental ABIEncoderV2;
 // SPDX-License-Identifier: MIT
 
-import "hardhat/console.sol";
-
 contract AkasifyCoreContract {
 
     struct Organization {

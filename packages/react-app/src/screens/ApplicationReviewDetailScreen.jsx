@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { Button, Layout, Row, Typography, Col, Card, Avatar, Tabs, Tag, Table, Carousel, Tooltip, Badge, Divider, Steps, Form, Input, Modal } from "antd";
-import { CalendarOutlined, LoadingOutlined, TagOutlined, FileProtectOutlined, DatabaseOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { Button, Layout, Row, Typography, Col, Card, Tabs, Table, Tooltip, Steps, Form, Input } from "antd";
 import { useTranslation } from "react-i18next";
-import { useContractLoader, useContractReader, useBalance, useEventListener, useExchangePrice } from "../hooks";
+import { useContractLoader, useContractReader, useEventListener } from "../hooks";
 import { Transactor } from "../helpers";
-import opportunityAvatar from "../assets/images/opportunity_avatar.png";
 import * as moment from "moment";
 import { BigNumber } from "@ethersproject/bignumber";
-import oasisLogo from "../assets/images/oasis_logo.png";
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -28,7 +25,6 @@ function ApplicationReviewDetailScreen({
   let { id } = useParams();
   let history = useHistory();
   const { t } = useTranslation();
-  const akasifyOasisAppId = "ce904c3e-ddca-4783-8241-b2a2ae7602f3";
   const parcelUrlAPI = "http://localhost:5000";
   const dateFormat = 'MM/DD/YYYY';
 
@@ -382,7 +378,8 @@ function ApplicationReviewDetailScreen({
                 >
                     <TextArea
                         autoSize={{ minRows: 10, maxRows: 20 }}
-                        disabled={ appStatus === 2 ? true : false }
+                        style={{fontSize: '20px'}}
+                        disabled={ true }
                         value={preAcValue}
                         onChange={e => setPreAcValue(e.target.value)}
                     />

@@ -103,7 +103,7 @@
       ]
     },
     "/Users/nestorbonilla/Documents/blockchain/akasify/packages/hardhat/contracts/AkasifyCoreContract.sol": {
-      "lastModificationDate": 1606856294790,
+      "lastModificationDate": 1606884328468,
       "sourceName": "contracts/AkasifyCoreContract.sol",
       "solcConfig": {
         "version": "0.6.7",
@@ -127,9 +127,7 @@
           }
         }
       },
-      "imports": [
-        "hardhat/console.sol"
-      ],
+      "imports": [],
       "versionPragmas": [
         ">=0.6.6"
       ],

@@ -53,7 +53,8 @@
       "graph-remove-local": "yarn workspace @akasify/subgraph graph remove --node http://localhost:8020/ akasify/your-contract",
       "graph-deploy-local": "yarn workspace @akasify/subgraph graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 akasify/your-contract",
       "graph-ship-local": "yarn graph-prepare && yarn graph-codegen && yarn graph-deploy-local",
-      "deploy-and-graph": "yarn deploy && yarn graph-ship-local"
+      "deploy-and-graph": "yarn deploy && yarn graph-ship-local",
+      "parcel": "yarn workspace @akasify/parcel watch"
     },
     "workspaces": {
       "packages": [

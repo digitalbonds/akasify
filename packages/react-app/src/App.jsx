@@ -129,8 +129,8 @@ function App(props) {
               <Route path='/opportunityedit:id' render={() => <OpportunityEditScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/opportunity:id' render={() => <OpportunityDetailScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
-              <Route path='/organization:id' component={OpportunityDetailScreen} />
-              <Route path='/organization' component={OrganizationScreen} />              
+              <Route path='/organization:id' render={() => <OpportunityDetailScreen /> } />
+              <Route path='/organization' render={() => <OrganizationScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} /> } />
               <Route path='/profile' component={ProfileScreen} />
               <Route path='/register' render={() => <RegisterScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/sucess' render={() => <RegisterSucessScreen />}/>
