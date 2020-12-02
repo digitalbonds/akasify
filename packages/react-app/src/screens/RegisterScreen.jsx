@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Row, Col, Layout, Typography, Form, Input, Button, Modal } from "antd";
 import { useContractLoader, useEventListener } from "../hooks";
 import { parcelConfig } from "../helpers/parcelConfig";
-import { OidcClient, Log } from "oidc-client";
+import { OidcClient } from "oidc-client";
 import oasisLogo from "../assets/images/oasis_logo.png";
 
 const { Title, Paragraph, Text } = Typography;
@@ -29,7 +29,7 @@ function RegisterScreen ({
     const [benForm] = Form.useForm();
 
     const onBenFinish = () => {
-        if (localStorage.getItem('akasify-oasis-address') == "" && localStorage.getItem('akasify-oasis-token') == "") {
+        if (localStorage.getItem('akasify-oasis-address') === "" && localStorage.getItem('akasify-oasis-token') === "") {
             setOasisModalVisible(true);
         } else {
             tx(writeContracts['AkasifyCoreContract'].registerBeneficiary(localStorage.getItem('akasify-oasis-address')));
@@ -44,7 +44,7 @@ function RegisterScreen ({
     }
 
     useEffect(() => {
-        if (setBeneficiaryEvents && setBeneficiaryEvents[0] && setBeneficiaryEvents[0].account == address) {       
+        if (setBeneficiaryEvents && setBeneficiaryEvents[0] && setBeneficiaryEvents[0].account === address) {       
             console.log("previous page in register: ", localStorage.getItem('akasify-page-previous'));
             history.push(localStorage.getItem('akasify-page-previous'));
         }
@@ -79,7 +79,7 @@ function RegisterScreen ({
                     </Form.Item>
                     <Form.Item style={{ textAlign: "center" }}>
                         <Button type="primary" htmlType="submit">{
-                            localStorage.getItem('akasify-oasis-address') == "" && localStorage.getItem('akasify-oasis-token') == "" ? "Sign Oasis" : "Register"
+                            localStorage.getItem('akasify-oasis-address') === "" && localStorage.getItem('akasify-oasis-token') === "" ? "Sign Oasis" : "Register"
                         }</Button>
                     </Form.Item>
                 </Form>
