@@ -6,7 +6,7 @@
 
 ## Resources
 
-* [Pitch (2 min.)](https://youtu.be/sug8reOlwJA)
+* [Pitch (2 min)](https://youtu.be/sug8reOlwJAX)
 * [Demo Parcel](https://youtu.be/_4OSDec_gs4)
 * [Demo ParaTime](https://youtu.be/fmPnBef7oOo)
 
@@ -16,11 +16,12 @@
   <img align="center" width="30%" src="/documentation/oasis_logo.svg">
 </p>
 
-* [Oasis Labs - Parcel](https://www.oasislabs.com/)
+* [Oasis Labs - Parcel](https://www.oasislabs.com)
+* [Oasis Ethereum](https://www.oasiseth.org/#developers)
 
 ## Documentation
 
-* [Gitbook] (https://nestorbonilla.gitbook.io/akasify/)
+* [Gitbook](https://nestorbonilla.gitbook.io/akasify)
 
 ## Attributions
 
