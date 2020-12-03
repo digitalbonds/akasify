@@ -1,4 +1,3 @@
-//pragma solidity >=0.6.0 <0.7.0;
 pragma solidity >=0.6.6;
 pragma experimental ABIEncoderV2;
 // SPDX-License-Identifier: MIT
@@ -167,33 +166,6 @@ contract AkasifyCoreContract {
         return (_organization.id, _organization.name, _organization.account, _organization.registerDate, _organization.status); 
     }
 
-    function getOrganizationByAddress(address _account)
-        public view returns(uint, string memory, address, uint, uint) {
-        for (uint i = 0; i < nextOrganizationId; i++) {    
-            Organization memory _organization = organizations[i];
-            if (_organization.account == _account) {
-                return (_organization.id, _organization.name, _organization.account, _organization.registerDate, _organization.status);          
-            }
-        }
-        return (0, "", 0x0000000000000000000000000000000000000000, 0, 0);
-    }
-
-    function registerBeneficiaryByAdmin(
-        address payable _account,
-        string memory _oasisAddress,
-        uint _status
-    ) public onlyAdmin() {
-        beneficiaries[nextBeneficiaryId] = Beneficiary(
-            nextBeneficiaryId,
-            _account,
-            _oasisAddress,
-            block.timestamp,
-            _status
-        );
-        nextBeneficiaryId++;
-        emit RegisterBeneficiary(_account);
-    }
-
     function registerBeneficiary(string memory _oasisAddress) public notAdmin() notOrganization() {
         beneficiaries[nextBeneficiaryId] = Beneficiary(
             nextBeneficiaryId,
@@ -228,17 +200,6 @@ contract AkasifyCoreContract {
         public view returns(uint, address, string memory, uint, uint) {
         Beneficiary memory _beneficiary = beneficiaries[_id];
         return (_beneficiary.id, _beneficiary.account, _beneficiary.oasisAddress, _beneficiary.registerDate, _beneficiary.status); 
-    }
-
-    function getBeneficiaryByAddress(address _account)
-        public view returns(uint, address, uint, uint) {
-        for (uint i = 0; i < nextBeneficiaryId; i++) {    
-            Beneficiary memory _beneficiary = beneficiaries[i];        
-            if (_beneficiary.account == _account) {
-                return (_beneficiary.id, _beneficiary.account, _beneficiary.registerDate, _beneficiary.status);          
-            }
-        }
-        return (0, 0x0000000000000000000000000000000000000000, 0, 0);
     }
 
     function createOpportunity(

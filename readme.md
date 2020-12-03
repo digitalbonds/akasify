@@ -6,8 +6,9 @@
 
 ## Resources
 
-* [Pitch](https://youtu.be/sug8reOlwJA)
+* [Pitch (2 min.)](https://youtu.be/sug8reOlwJA)
 * [Demo Parcel](https://youtu.be/_4OSDec_gs4)
+* [Demo ParaTime](https://youtu.be/fmPnBef7oOo)
 
 ## Featured Technology
 
@@ -16,6 +17,10 @@
 </p>
 
 * [Oasis Labs - Parcel](https://www.oasislabs.com/)
+
+## Documentation
+
+* [Gitbook] (https://nestorbonilla.gitbook.io/akasify/)
 
 ## Attributions
 

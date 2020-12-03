@@ -38,13 +38,19 @@ module.exports = {
   // (then your frontend will talk to your contracts on the live network!)
   // (you will need to restart the `yarn run start` dev server after editing the .env)
 
-  networks: {
+  networks: {    
     localhost: {
       url: "http://localhost:8545",
       /*
         notice no mnemonic here? it will just use account 0 of the hardhat node to deploy
         (you can put in a mnemonic here to set the deployer locally)
       */
+    },
+    paratime: {
+      url: "https://devchain.secondstate.io:8545", //<---- ES Provider Endpoint
+      accounts: {
+        mnemonic: mnemonic(),
+      },
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/dfd1cdc752364456af19b6315fb9e415", //<---- YOUR INFURA ID! (or it won't work)
@@ -76,13 +82,7 @@ module.exports = {
       accounts: {
         mnemonic: mnemonic(),
       },
-    },
-    paratime: {
-      url: "https://opendapps.secondstate.io:8545", //<---- ES Provider Endpoint
-      accounts: {
-        mnemonic: mnemonic(),
-      },
-    },
+    }
   },
   solidity: {
     version: "0.6.7",
