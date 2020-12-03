@@ -17,7 +17,7 @@
 </p>
 
 * [Oasis Labs - Parcel](https://www.oasislabs.com)
-* [Oasis Ethereum](https://www.oasiseth.org/#developers)
+* [Oasis Ethereum - ParaTime](https://www.oasiseth.org/#developers)
 
 ## Documentation
 
