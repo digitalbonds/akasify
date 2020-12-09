@@ -4,7 +4,11 @@
 
 **Akasify** is a platform of semi-private profiles of young change-makers and social activists to build an immutable profile that allows civil society organizations to allocate resources efficiently, creating a circular economy of gitfs. It uses Oasis Parcel as its main privacy technology to make beneficiaries owners of their sensitive information.
 
-## Resources
+## Unicef Innovation Fund
+
+* [Pitch](https://youtu.be/MVZaqq95WWA)
+
+## Oasis Network Quest Hackathon
 
 * [Pitch (2 min)](https://youtu.be/sug8reOlwJAX)
 * [Demo Parcel](https://youtu.be/_4OSDec_gs4)
