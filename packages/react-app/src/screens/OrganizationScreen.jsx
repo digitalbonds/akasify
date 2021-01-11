@@ -33,11 +33,12 @@ function OrganizationScreen ({
                 id: BigNumber.from(organizations[0][i]).toNumber(),
                 key: BigNumber.from(organizations[0][i]).toNumber(),
                 name: organizations[1][i],
-                account: organizations[2][i],
-                registerDate: BigNumber.from(organizations[3][i]).toNumber(),
-                status: BigNumber.from(organizations[4][i]).toNumber(),
-                image: organizationImage,
-                avatar: organizationAvatar
+                image: organizations[2][i],
+                account: organizations[3][i],
+                registerDate: BigNumber.from(organizations[4][i]).toNumber(),
+                status: BigNumber.from(organizations[5][i]).toNumber(),
+                //image: organizationImage,
+                //avatar: organizationAvatar
             });
         }   
     }
@@ -61,7 +62,11 @@ function OrganizationScreen ({
                 }
             >
                 <List.Item.Meta
-                    avatar={<Avatar src={item.avatar} />}
+                    avatar={
+                        <Avatar
+                            src={`https://${item.image}.${process.env.REACT_APP_INFURA_GATEWAY}`}
+                        />
+                    }
                     title={<a href={item.href}>{item.name}</a>}
                     description={
                         <div className="opportunity-detail-card">

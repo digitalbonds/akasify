@@ -22,23 +22,34 @@ function OpportunityScreen ({
 }) {
   
   const readContracts = useContractLoader(localProvider);
+  const organizations = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizations");
   const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
-  //const [imageUrl, setImageUrl] = useState();
-  //const [imageHash, setImageHash] = useState();
-  const [imageStream, setImageStream] = useState();
-  
   const dateFormat = process.env.REACT_APP_DATE_FORMAT;
   const length = 250; // description max characters to show in preview
-  let count = 0;
 
   const oppData = () => {
     let data = [];
     if (opportunities) {
       for (let i = 0; i < opportunities[0].length; i++) {
+
+        let organizationName = "";
+        let organizationImage = "";
+        // Get name and image url from organization
+        if (organizations) {
+          for (let j = 0; j < organizations[0].length; j++) {
+            if (BigNumber.from(organizations[0][j]).toNumber() == BigNumber.from(opportunities[1][i]).toNumber()) {
+              organizationName = organizations[1][j];
+              organizationImage = organizations[2][j];
+            }
+          }
+        }
+
         data.push({
           id: BigNumber.from(opportunities[0][i]).toNumber(),
           key: BigNumber.from(opportunities[0][i]).toNumber(),
-          organizationName: opportunities[1][i],
+          organizationId: BigNumber.from(opportunities[1][i]).toNumber(),
+          organizationName: organizationName,
+          organizationImage: organizationImage,
           name: opportunities[2][i],
           description: opportunities[3][i],
           imageHash: opportunities[4][i],
@@ -106,7 +117,12 @@ function OpportunityScreen ({
                 ]}
               >
                 <Meta
-                  avatar={<Avatar src={item.avatar} />}
+                  avatar={
+                    <Avatar
+                      //src={item.avatar}
+                      src={`https://${item.organizationImage}.${process.env.REACT_APP_INFURA_GATEWAY}`}
+                    />
+                  }
                   title={ <NavLink to={ role === "organization" ? `/opportunityedit:${item.id}` : `/opportunity:${item.id}`}>{item.name}</NavLink>}
                   description={
                     <div className="opportunity-detail-card">

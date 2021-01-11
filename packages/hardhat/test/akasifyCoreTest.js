@@ -20,9 +20,9 @@ describe('Digital Bonds - Smart Contract Tests', function () {
 
     it('Should register an organization by admin', async () => {
       const organizationAddress = await organization.getAddress();
-      await akasifyCore.registerOrganizationByAdmin("Digital Bonds", organizationAddress, 3);
+      await akasifyCore.registerOrganizationByAdmin("Digital Bonds", "", organizationAddress, 3);
       const organizationValues = await akasifyCore.getOrganizationByAddress(organizationAddress);
-      assert(organizationValues[2] === organizationAddress && organizationValues[4].toNumber() === 3, 'verify status');
+      assert(organizationValues[3] === organizationAddress && organizationValues[5].toNumber() === 3, 'verify status');
     });
 
     it('Should register a beneficiary', async () => {      
@@ -35,6 +35,7 @@ describe('Digital Bonds - Smart Contract Tests', function () {
     it('Should register an opportunity', async () => {
       await akasifyCore.connect(organization).createOpportunity(
         "opportunity name",
+        "image hash",
         "opportunity description",
         0,
         0,

@@ -610,9 +610,9 @@
         "type": "uint256[]"
       },
       {
-        "internalType": "string[]",
+        "internalType": "uint256[]",
         "name": "",
-        "type": "string[]"
+        "type": "uint256[]"
       },
       {
         "internalType": "string[]",
@@ -728,6 +728,11 @@
         "type": "string"
       },
       {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      },
+      {
         "internalType": "address",
         "name": "",
         "type": "address"
@@ -773,6 +778,11 @@
         "internalType": "uint256[]",
         "name": "",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
       },
       {
         "internalType": "string[]",
@@ -1232,6 +1242,11 @@
       {
         "internalType": "string",
         "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "imageHash",
         "type": "string"
       },
       {

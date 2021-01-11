@@ -7,6 +7,7 @@ contract AkasifyCoreContract {
     struct Organization {
         uint id;
         string name;
+        string imageHash;
         address payable account;
         uint registerDate;
         uint status;
@@ -126,6 +127,7 @@ contract AkasifyCoreContract {
 
     function registerOrganizationByAdmin(
         string memory name,
+        string memory imageHash,
         address payable account,
         uint status
     ) public onlyAdmin() returns(uint) {
@@ -133,6 +135,7 @@ contract AkasifyCoreContract {
         organizations[nextOrganizationId] = Organization(
             nextOrganizationId,
             name,
+            imageHash,
             account,
             block.timestamp,
             status
@@ -142,10 +145,11 @@ contract AkasifyCoreContract {
     }
 
     function getOrganizations()
-        public view returns(uint[] memory, string[] memory, address[] memory, uint[] memory, uint[] memory) {
+        public view returns(uint[] memory, string[] memory, string[] memory, address[] memory, uint[] memory, uint[] memory) {
 
         uint[] memory ids = new uint[](nextOrganizationId);
         string[] memory names = new string[](nextOrganizationId);
+        string[] memory images = new string[](nextOrganizationId);
         address[] memory accounts = new address[](nextOrganizationId);
         uint[] memory registerDates = new uint[](nextOrganizationId);
         uint[] memory status = new uint[](nextOrganizationId);
@@ -154,17 +158,29 @@ contract AkasifyCoreContract {
             Organization memory _organization = organizations[i];
             ids[i] = _organization.id;
             names[i] = _organization.name;
+            images[i] = _organization.imageHash;
             accounts[i] = _organization.account;
             registerDates[i] = _organization.registerDate;
             status[i] = _organization.status;
         }
-        return (ids, names, accounts, registerDates, status);
+        return (ids, names, images, accounts, registerDates, status);
     }
     
     function getOrganizationById(uint _id)
-        public view returns(uint, string memory, address, uint, uint) {
+        public view returns(uint, string memory, string memory, address, uint, uint) {
         Organization memory _organization = organizations[_id];
-        return (_organization.id, _organization.name, _organization.account, _organization.registerDate, _organization.status); 
+        return (_organization.id, _organization.name, _organization.imageHash, _organization.account, _organization.registerDate, _organization.status); 
+    }
+
+    function getOrganizationByAddress(address account)
+        public view returns(uint, string memory, string memory, address, uint, uint) {
+        Organization memory _organization;
+        for (uint i = 0; i < nextOrganizationId; i++) {
+            if (organizations[i].account == account && organizations[i].status == 3) {
+                _organization = organizations[i];
+            }
+        }
+        return (_organization.id, _organization.name, _organization.imageHash, _organization.account, _organization.registerDate, _organization.status);
     }
 
     function registerBeneficiary(string memory _oasisAddress) public notAdmin() notOrganization() {
@@ -352,10 +368,10 @@ contract AkasifyCoreContract {
     }
 
     function getOpportunities()
-        public view returns(uint[] memory, string[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory) {
+        public view returns(uint[] memory, uint[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory) {
 
         uint[] memory ids = new uint[](nextOpportunityId);
-        string[] memory organizationNames = new string[](nextOpportunityId);
+        uint[] memory organizationIds = new uint[](nextOpportunityId);
         string[] memory names = new string[](nextOpportunityId);
         string[] memory descriptions = new string[](nextOpportunityId);
         string[] memory imageHashes = new string[](nextOpportunityId);
@@ -369,7 +385,7 @@ contract AkasifyCoreContract {
         for (uint i = 0; i < nextOpportunityId; i++) {
             Opportunity storage _opportunity = opportunities[i];
             ids[i] = _opportunity.id;
-            organizationNames[i] = organizations[_opportunity.organizationId].name;
+            organizationIds[i] = _opportunity.organizationId;
             names[i] = _opportunity.name;
             descriptions[i] = _opportunity.description;
             imageHashes[i] = _opportunity.imageHash;
@@ -379,8 +395,7 @@ contract AkasifyCoreContract {
             //lastUpdates[i] = _opportunity.lastUpdate;
             status[i] = _opportunity.status;
         }
-        //return (ids, organizationNames, names, descriptions, preRequirementDeadlines, postRequirementsDeadlines, creationDates, lastUpdates, status);
-        return (ids, organizationNames, names, descriptions, imageHashes, preRequirementDeadlines, postRequirementsDeadlines, status);
+        return (ids, organizationIds, names, descriptions, imageHashes, preRequirementDeadlines, postRequirementsDeadlines, status);
     }
 
     function getOpportunityById(uint opportunityId)

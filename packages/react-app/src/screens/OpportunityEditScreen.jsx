@@ -393,7 +393,7 @@ function OpportunityEditScreen ({
                         valuePropName="opp-images"
                     >
                         <input type="file" onChange={(e) => { uploadImage(e) }} />
-                    </Form.Item>                
+                    </Form.Item>
                     <Form.Item>
                         <Row gutter={[100, 16]}>
                             <Col span={1}>

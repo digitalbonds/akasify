@@ -3,7 +3,10 @@ import { Row, Col, Table, Layout, Typography, Form, Input, Button } from "antd";
 import { useContractLoader, useContractReader } from "../hooks";
 import { useTranslation } from "react-i18next";
 import { BigNumber } from "@ethersproject/bignumber";
+const ipfsClient = require("ipfs-http-client");
 
+const infura = { host: process.env.REACT_APP_INFURA_HOST, port: process.env.REACT_APP_INFURA_PORT, protocol: process.env.REACT_APP_INFURA_PROTOCOL };
+const ipfs = ipfsClient(infura);
 const { Title } = Typography;
 
 function AdminScreen ({
@@ -23,6 +26,7 @@ function AdminScreen ({
 
     const [orgForm] = Form.useForm();
     const [orgName, setOrgName] = useState("");
+    const [orgImageHash, setOrgImageHash] = useState("");
     const [orgAccount, setOrgAccount] = useState("");
     
     const [benForm] = Form.useForm();
@@ -106,12 +110,20 @@ function AdminScreen ({
     }
 
     const onOrgFinish = () => {
-        tx(writeContracts.AkasifyCoreContract.registerOrganizationByAdmin(orgName, orgAccount, 3));
+        tx(writeContracts.AkasifyCoreContract.registerOrganizationByAdmin(orgName, orgImageHash, orgAccount, 3));
     };
 
     const onBenFinish = () => {
         tx(writeContracts['AkasifyCoreContract'].registerBeneficiaryByAdmin(benAccount, 3));
     };
+
+    const uploadImage = async (e) => {
+        const file = e.target.files[0];
+        const added = await ipfs.add(file);
+        let v1cid = added.cid.toV1().toBaseEncodedString('base32');
+        console.log("ipfs image hash: ", v1cid);
+        setOrgImageHash(v1cid);
+    }
 
   return (
     <Layout className="site-layout">
@@ -156,6 +168,13 @@ function AdminScreen ({
                             placeholder="eth address"
                             value={orgAccount}
                             onChange={e => setOrgAccount(e.target.value)} />
+                    </Form.Item>
+                    <Form.Item
+                        name="org-image"
+                        label="Image"
+                        valuePropName="org-image"
+                    >
+                        <input type="file" onChange={(e) => { uploadImage(e) }} />
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">Save</Button>
