@@ -21,14 +21,28 @@ function OrganizationScreen ({
   logoutOfWeb3Modal
 }) {
 
-  const dateFormat = 'MM/DD/YYYY';
+  const dateFormat = process.env.REACT_APP_DATE_FORMAT;
   const readContracts = useContractLoader(localProvider);
   const organizations = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizations");
+  const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
 
   const orgData = () => {
     let data = [];
     if (organizations) {
         for (let i = 0; i < organizations[0].length; i++) {
+
+            let opportunityCount = 0;
+
+            if (opportunities) {
+                for (let j = 0; j < opportunities[0].length; j++) {
+                    let opportunityOrganizationId = BigNumber.from(opportunities[1][j]).toNumber();
+                    let organizationId = BigNumber.from(organizations[0][i]).toNumber();
+                    if (opportunityOrganizationId == organizationId) {
+                        opportunityCount++;
+                    }
+                }
+            }
+            
             data.push({
                 id: BigNumber.from(organizations[0][i]).toNumber(),
                 key: BigNumber.from(organizations[0][i]).toNumber(),
@@ -37,8 +51,7 @@ function OrganizationScreen ({
                 account: organizations[3][i],
                 registerDate: BigNumber.from(organizations[4][i]).toNumber(),
                 status: BigNumber.from(organizations[5][i]).toNumber(),
-                //image: organizationImage,
-                //avatar: organizationAvatar
+                opportunityCount: opportunityCount
             });
         }   
     }
@@ -58,7 +71,7 @@ function OrganizationScreen ({
             <List.Item
                 key={item.title}
                 extra={
-                    <Statistic title="Opportunities" value={1} prefix={<FormOutlined />} />
+                    <Statistic title="Opportunities" value={item.opportunityCount} prefix={<FormOutlined />} />
                 }
             >
                 <List.Item.Meta

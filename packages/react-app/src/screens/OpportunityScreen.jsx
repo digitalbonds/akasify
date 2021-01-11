@@ -91,7 +91,7 @@ function OpportunityScreen ({
                     icon={<PlusCircleOutlined />}
                     data-testid="add-contact-button"
                   >
-                    <NavLink style={{color: "#FFF", padding:"12px"}} to="/opportunityedit:0">Create</NavLink>
+                    <NavLink style={{color: "#FFF", padding:"12px"}} to="/opportunityedit:NaN">Create</NavLink>
                   </Button>
                 </div>
               )}              
