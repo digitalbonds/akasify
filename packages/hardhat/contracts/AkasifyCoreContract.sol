@@ -24,7 +24,8 @@ contract AkasifyCoreContract {
         uint id;
         uint organizationId;
         string name;
-        string description;        
+        string description;
+        string imageHash;
         uint preRequirementsDeadline;
         uint postRequirementsDeadline;
         uint creationDate;
@@ -205,6 +206,7 @@ contract AkasifyCoreContract {
     function createOpportunity(
         string memory name,
         string memory description,
+        string memory imageHash,
         uint preRequirementsDeadline,
         uint postRequirementsDeadline,
         uint[] memory preRequirementTypes,
@@ -224,6 +226,7 @@ contract AkasifyCoreContract {
         opportunities[nextOpportunityId].id = nextOpportunityId;
         opportunities[nextOpportunityId].organizationId = getOrganizationIdByAddress(msg.sender);
         opportunities[nextOpportunityId].name = name;
+        opportunities[nextOpportunityId].imageHash = imageHash;
         opportunities[nextOpportunityId].description = description;        
         opportunities[nextOpportunityId].creationDate = block.timestamp;
         opportunities[nextOpportunityId].preRequirementsDeadline = preRequirementsDeadline;
@@ -349,12 +352,13 @@ contract AkasifyCoreContract {
     }
 
     function getOpportunities()
-        public view returns(uint[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory) {
+        public view returns(uint[] memory, string[] memory, string[] memory, string[] memory, string[] memory, uint[] memory, uint[] memory, uint[] memory) {
 
         uint[] memory ids = new uint[](nextOpportunityId);
         string[] memory organizationNames = new string[](nextOpportunityId);
         string[] memory names = new string[](nextOpportunityId);
         string[] memory descriptions = new string[](nextOpportunityId);
+        string[] memory imageHashes = new string[](nextOpportunityId);
         uint[] memory preRequirementDeadlines = new uint[](nextOpportunityId);
         uint[] memory postRequirementsDeadlines = new uint[](nextOpportunityId);
         //uint[] memory creationDates = new uint[](nextOpportunityId);
@@ -368,6 +372,7 @@ contract AkasifyCoreContract {
             organizationNames[i] = organizations[_opportunity.organizationId].name;
             names[i] = _opportunity.name;
             descriptions[i] = _opportunity.description;
+            imageHashes[i] = _opportunity.imageHash;
             preRequirementDeadlines[i] = _opportunity.preRequirementsDeadline;
             postRequirementsDeadlines[i] = _opportunity.postRequirementsDeadline;
             //creationDates[i] = _opportunity.creationDate;
@@ -375,15 +380,15 @@ contract AkasifyCoreContract {
             status[i] = _opportunity.status;
         }
         //return (ids, organizationNames, names, descriptions, preRequirementDeadlines, postRequirementsDeadlines, creationDates, lastUpdates, status);
-        return (ids, organizationNames, names, descriptions, preRequirementDeadlines, postRequirementsDeadlines, status);
+        return (ids, organizationNames, names, descriptions, imageHashes, preRequirementDeadlines, postRequirementsDeadlines, status);
     }
 
     function getOpportunityById(uint opportunityId)
-        public view returns(uint, string memory, string memory, uint, uint, uint, uint, uint) {
+        public view returns(uint, string memory, string memory, string memory, uint, uint, uint, uint, uint) {
 
         Opportunity storage _opportunity = opportunities[opportunityId];
 
-        return (_opportunity.organizationId, _opportunity.name, _opportunity.description, _opportunity.preRequirementsDeadline, _opportunity.postRequirementsDeadline, _opportunity.creationDate, _opportunity.lastUpdate, _opportunity.status);
+        return (_opportunity.organizationId, _opportunity.name, _opportunity.description, _opportunity.imageHash, _opportunity.preRequirementsDeadline, _opportunity.postRequirementsDeadline, _opportunity.creationDate, _opportunity.lastUpdate, _opportunity.status);
     }
 
     function getApplication(uint opportunityId, address beneficiaryAddress) 

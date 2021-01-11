@@ -29,7 +29,6 @@ function ApplicationReviewScreen ({
     const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
     const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", id.replace(":",""));
     const applications = useContractReader(readContracts, 'AkasifyCoreContract', "getApplicationsByOpportunityId", id.replace(":",""));
-    console.log("applications: ", applications);
     
     const oppOrganization = () => {
         if (organization)
@@ -42,11 +41,12 @@ function ApplicationReviewScreen ({
             setOppId(BigNumber.from(opportunity[0]).toNumber());
             setOppName(opportunity[1]);
             setOppDescription(opportunity[2]);
-            setOppPreRequirementDeadline(BigNumber.from(opportunity[3]).toNumber());
-            setOppPostRequirementDeadline(BigNumber.from(opportunity[4]).toNumber());
-            setOppCreationDate(BigNumber.from(opportunity[5]).toNumber());
-            setOppLastUpdate(BigNumber.from(opportunity[6]).toNumber());
-            setOppStatus(BigNumber.from(opportunity[7]).toNumber());
+            setOppImage(opportunity[3]);
+            setOppPreRequirementDeadline(BigNumber.from(opportunity[4]).toNumber());
+            setOppPostRequirementDeadline(BigNumber.from(opportunity[5]).toNumber());
+            setOppCreationDate(BigNumber.from(opportunity[6]).toNumber());
+            setOppLastUpdate(BigNumber.from(opportunity[7]).toNumber());
+            setOppStatus(BigNumber.from(opportunity[8]).toNumber());
         }
     }, [opportunity]);
 
@@ -58,6 +58,7 @@ function ApplicationReviewScreen ({
     const [oppOrganizationName, setOppOrganizationName] = useState("");
     const [oppName, setOppName] = useState();
     const [oppDescription, setOppDescription] = useState("");
+    const [oppImage, setOppImage] = useState("");
     const [oppPreRequirementDeadline, setOppPreRequirementDeadline] = useState(moment().unix());
     const [oppPosRequirementDeadline, setOppPostRequirementDeadline] = useState(moment().unix());    
     const [oppCreationDate, setOppCreationDate] = useState(moment().unix());

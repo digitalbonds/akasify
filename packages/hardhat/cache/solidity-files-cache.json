@@ -69,39 +69,6 @@
         "YourContract"
       ]
     },
-    "/Users/nestorbonilla/Documents/blockchain/akasify/packages/hardhat/contracts/AkasifyCoreContract.sol": {
-      "lastModificationDate": 1606962768759,
-      "sourceName": "contracts/AkasifyCoreContract.sol",
-      "solcConfig": {
-        "version": "0.6.7",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.6.6"
-      ],
-      "artifacts": [
-        "AkasifyCoreContract"
-      ]
-    },
     "/Users/nestorbonilla/Documents/blockchain/akasify/node_modules/hardhat/console.sol": {
       "lastModificationDate": 1606966578764,
       "sourceName": "hardhat/console.sol",
@@ -133,6 +100,39 @@
       ],
       "artifacts": [
         "console"
+      ]
+    },
+    "/Users/nestorbonilla/Documents/blockchain/akasify/packages/hardhat/contracts/AkasifyCoreContract.sol": {
+      "lastModificationDate": 1610288451364,
+      "sourceName": "contracts/AkasifyCoreContract.sol",
+      "solcConfig": {
+        "version": "0.6.7",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.6.6"
+      ],
+      "artifacts": [
+        "AkasifyCoreContract"
       ]
     }
   }

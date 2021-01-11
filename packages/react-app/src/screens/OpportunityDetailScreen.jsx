@@ -28,9 +28,6 @@ function OpportunityDetailScreen({
   let { id } = useParams();
   let history = useHistory();
   const { t } = useTranslation();
-  const akasifyOasisAppId = "ce904c3e-ddca-4783-8241-b2a2ae7602f3";
-  const parcelUrlAPI = "http://localhost:5000";
-  const dateFormat = 'MM/DD/YYYY';
 
   const readContracts = useContractLoader(localProvider);
   const writeContracts = useContractLoader(userProvider);
@@ -43,6 +40,8 @@ function OpportunityDetailScreen({
   const [appCreationDate, setAppCreationDate] = useState(0);
   const [appLastUpdate, setAppLastUpdate] = useState(0);
   const [appStatus, setAppStatus] = useState(0);
+
+  //const [oppImage, setOppImage] = useState("");
 
   // PRE ACCOMPLISHMENT
   const [preAcId, setPreAcId] = useState(0);
@@ -64,6 +63,8 @@ function OpportunityDetailScreen({
 
   // SMART CONTRACT HOOKS
   const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
+  //setOppImage(opportunity && opportunity[3]);
+  console.log("opportunity data: ", opportunity && opportunity[3]);
   const application = useContractReader(readContracts, 'AkasifyCoreContract', "getApplication", [id.replace(":",""), address]);
   const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
   //const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
@@ -76,12 +77,12 @@ function OpportunityDetailScreen({
 
   useEffect(() => {
     if (application && application.length > 0 && appLastUpdate != BigNumber.from(application[4]).toNumber()) {
-        setAppId(BigNumber.from(application[0]).toNumber());
-        setAppOpportunityId(BigNumber.from(application[1]).toNumber());
-        setAppBeneficiaryId(BigNumber.from(application[2]).toNumber());
-        setAppCreationDate(BigNumber.from(application[3]).toNumber());
-        setAppLastUpdate(BigNumber.from(application[4]).toNumber());
-        setAppStatus(BigNumber.from(application[5]).toNumber());        
+      setAppId(BigNumber.from(application[0]).toNumber());
+      setAppOpportunityId(BigNumber.from(application[1]).toNumber());
+      setAppBeneficiaryId(BigNumber.from(application[2]).toNumber());
+      setAppCreationDate(BigNumber.from(application[3]).toNumber());
+      setAppLastUpdate(BigNumber.from(application[4]).toNumber());
+      setAppStatus(BigNumber.from(application[5]).toNumber());        
     }
   }, [application]);
   
@@ -101,7 +102,7 @@ function OpportunityDetailScreen({
   // OASIS PARCEL
   const assignPermission = async () => {
     localStorage.setItem('akasify-oasis-previous', history.location.pathname);
-    const permissionUrl = `https://steward.oasiscloud.io/apps/${akasifyOasisAppId}/join?redirect_uri=http://localhost:3000/callback`;
+    const permissionUrl = `${process.env.REACT_APP_PARCEL_STEWARD_URL}/${process.env.REACT_APP_PARCEL_APP_ID}/join?redirect_uri=${process.env.REACT_APP_PARCEL_CALLBACK_URL}`;
     window.open(permissionUrl);
   }
 
@@ -127,7 +128,7 @@ function OpportunityDetailScreen({
 
   const uploadData = async () => {
     console.log("api token: ", localStorage.getItem('akasify-oasis-token'));
-    const response = await fetch(`${parcelUrlAPI}/beneficiaries/createStep`, {
+    const response = await fetch(`${process.env.REACT_APP_PARCEL_API_URL}/beneficiaries/createStep`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -137,7 +138,6 @@ function OpportunityDetailScreen({
         opportunityId: appOpportunityId,
         value: preAcValue,
         beneficiaryAddress: localStorage.getItem('akasify-oasis-address')
-        //token: localStorage.getItem('akasify-oasis-token')
       })
     }).then((res) => res.json());
     createPreAccomplishment(response.datasetAddress);
@@ -229,11 +229,22 @@ function OpportunityDetailScreen({
 };
 
   const contentStyle = {
-    height: '300px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
+    width: "100%",
+    height: "300px",
+    objectFit: "cover",
+
+    // maxWidth: "100%",
+    // height: "300px",
+    // display: "block",
+    // marginLeft: "auto",
+    // marginRight: "auto",
+    // overflow: "hidden",
+
+    // width: "100%",
+    // height: "300px",
+    // overflow: "hidden",
+    // backgroundSize: "cover",
+    // backgroundPosition: "center center"
   };
 
   return (
@@ -257,12 +268,11 @@ function OpportunityDetailScreen({
       <Card
         style={{ width: '100%' }}
         cover={
-          <Carousel autoplay>
+          <Carousel>
             <div key={1}>
-              <h3 style={contentStyle}>1</h3>
-            </div>
-            <div key={2}>
-              <h3 style={contentStyle}>2</h3>
+              <img
+                style={contentStyle}
+                src={`https://${opportunity ? opportunity[3] : ""}.${process.env.REACT_APP_INFURA_GATEWAY}`} />            
             </div>
           </Carousel>
         }
@@ -279,7 +289,7 @@ function OpportunityDetailScreen({
                   </Tooltip>
                 </Col>
                 <Col span={20}>
-                  {opportunity && moment.unix(opportunity[3]).format(dateFormat)}
+                  {opportunity && moment.unix(opportunity[4]).format(process.env.REACT_APP_DATE_FORMAT)}
                 </Col>
               </Row>
               <Row justify="space-between" style={{marginBottom: "8px"}}>
@@ -289,7 +299,7 @@ function OpportunityDetailScreen({
                   </Tooltip>
                 </Col>
                 <Col span={20}>
-                  {opportunity && moment.unix(opportunity[4]).format(dateFormat)}
+                  {opportunity && moment.unix(opportunity[5]).format(process.env.REACT_APP_DATE_FORMAT)}
                 </Col>
               </Row>
               <Divider />

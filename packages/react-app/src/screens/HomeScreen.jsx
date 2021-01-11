@@ -27,7 +27,7 @@ function LandingPage({
           </Row>
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}>Akasify {moment(new Date()).format('YYYY')} Created by Nestor Bonilla <br/> Digital Bonds</Footer>
+      <Footer style={{ textAlign: 'center' }}>© {moment(new Date()).format('YYYY')} Created by Digital Bonds</Footer>
     </Layout>
   )
 }

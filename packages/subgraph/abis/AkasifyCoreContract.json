@@ -270,6 +270,11 @@
         "type": "string"
       },
       {
+        "internalType": "string",
+        "name": "imageHash",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
         "name": "preRequirementsDeadline",
         "type": "uint256"
@@ -620,6 +625,11 @@
         "type": "string[]"
       },
       {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
+      },
+      {
         "internalType": "uint256[]",
         "name": "",
         "type": "uint256[]"
@@ -652,6 +662,11 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
       },
       {
         "internalType": "string",
@@ -1148,6 +1163,11 @@
       {
         "internalType": "string",
         "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "imageHash",
         "type": "string"
       },
       {

@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select, Upload, Modal } from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { ConsoleSqlOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useParams, useHistory } from "react-router-dom";
 import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { BigNumber } from "@ethersproject/bignumber";
+const ipfsClient = require("ipfs-http-client");
+
+const infura = { host: process.env.REACT_APP_INFURA_HOST, port: process.env.REACT_APP_INFURA_PORT, protocol: process.env.REACT_APP_INFURA_PROTOCOL };
+const ipfs = ipfsClient(infura);
+
 const { Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-function getBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
 
 function OpportunityEditScreen ({
   address,
@@ -31,20 +28,12 @@ function OpportunityEditScreen ({
 
     let { id } = useParams();
     let history = useHistory();
-    const dateFormat = 'MM/DD/YYYY';
+    const dateFormat = process.env.REACT_APP_DATE_FORMAT;
 
     const readContracts = useContractLoader(localProvider);
     const writeContracts = useContractLoader(userProvider);
 
-    const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
-    
-    // console.log("opportunity data: ", opportunity);
-    //console.log("opportunity pre requirement: ", opportunity && BigNumber.from(opportunity[3]).toNumber());
-    // console.log("opportunity pre requirement moment date: ", opportunity && moment(BigNumber.from(opportunity[3]).toNumber()).format("YYYY-MM-DD"));
-    //console.log("opportunity pre requirement moment date: ", opportunity && moment(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat));
-    //console.log("opportunity created pre requirement deadline date YYYY-MM-DD: ", opportunity && moment.unix(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat));
-    //console.log("opportunity pre requirement moment date: ", opportunity && moment.unix(BigNumber.from(opportunity[3]).toNumber()).format("YYYY-MM-DD"));
-    
+    const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));    
     const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", id.replace(":",""));
     const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
     const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));
@@ -92,17 +81,19 @@ function OpportunityEditScreen ({
             setOppId(BigNumber.from(opportunity[0]).toNumber());
             setOppName(opportunity[1]);
             setOppDescription(opportunity[2]);
-            setOppPreRequirementDeadline(BigNumber.from(opportunity[3]).toNumber());
-            setOppPostRequirementDeadline(BigNumber.from(opportunity[4]).toNumber());
-            setOppCreationDate(BigNumber.from(opportunity[5]).toNumber());
-            setOppLastUpdate(BigNumber.from(opportunity[6]).toNumber());
-            setOppStatus(BigNumber.from(opportunity[7]).toNumber());
+            setOppImageHash(opportunity[3]);
+            setOppPreRequirementDeadline(BigNumber.from(opportunity[4]).toNumber());
+            setOppPostRequirementDeadline(BigNumber.from(opportunity[5]).toNumber());
+            setOppCreationDate(BigNumber.from(opportunity[6]).toNumber());
+            setOppLastUpdate(BigNumber.from(opportunity[7]).toNumber());
+            setOppStatus(BigNumber.from(opportunity[8]).toNumber());
         }
     }, [opportunity]);
 
     const [oppForm] = Form.useForm();
     const [preRequirementForm] = Form.useForm();
     const [postRequirementForm] = Form.useForm();
+
 
     // OPPORTUNITY
     const [oppId, setOppId] = useState(0);
@@ -115,6 +106,8 @@ function OpportunityEditScreen ({
     const [oppCreationDate, setOppCreationDate] = useState(moment().unix());
     const [oppLastUpdate, setOppLastUpdate] = useState(moment().unix());
     const [oppStatus, setOppStatus] = useState(0);
+    const [oppImageHash, setOppImageHash] = useState("");
+    const [oppImageStream, setOppImageStream] = useState("");
 
     // PRE-REQUIREMENT
     const [preRow, setPreRow] = useState(0);
@@ -176,6 +169,7 @@ function OpportunityEditScreen ({
         }
         return requirementType;
     }
+
     const preRequirementData = () => {
         let data = [];
         if (preRequirements) {
@@ -213,13 +207,7 @@ function OpportunityEditScreen ({
     };
 
     const onOppCreate = () => {
-        // console.log("opportunity created pre requirement deadline number: ", oppPreRequirementDeadline);
-        // console.log("opportunity created pre requirement deadline date: ", moment.unix(oppPreRequirementDeadline));
-        // console.log("opportunity created pre requirement deadline date MM-DD-YYYY: ", moment.unix(oppPreRequirementDeadline).format(dateFormat));
-        // console.log("opportunity created post requirement deadline number: ", oppPosRequirementDeadline);
-        // console.log("opportunity created post requirement deadline date: ", moment.unix(oppPosRequirementDeadline));
-        // console.log("opportunity created post requirement deadline date MM-DD-YYYY: ", moment.unix(oppPosRequirementDeadline).format(dateFormat));
-        tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));        
+       tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppImageHash, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));        
     };
 
     const onOppUpdateStatus = (e) => {
@@ -234,41 +222,18 @@ function OpportunityEditScreen ({
     const onPostRequirementCreate = () => {
         tx(writeContracts.AkasifyCoreContract.createPostRequirement(oppId, preType, preValue, preName));
     }
-
-    const uploadImage = async (data) => {
-        console.log("image data: ", data);
-        const imageStream = await getBase64(data);
-        console.log("image stream: ", imageStream);
-        const response = await fetch('https://rinkeby.infura.io/v3/dfd1cdc752364456af19b6315fb9e415/add', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: imageStream
-        }).then((res) => res.json());
-        const hash = response;
-        console.log("hash: ", hash);
+    
+    const uploadImage = async (e) => {
+        const file = e.target.files[0];
+        const added = await ipfs.add(file);
+        let v1cid = added.cid.toV1().toBaseEncodedString('base32');
+        console.log("ipfs image hash: ", v1cid);
+        setOppImageHash(v1cid);
     }
 
-    const uploadButton = (
-        <div>
-          <PlusOutlined />
-          <div style={{ marginTop: 8 }}>Upload</div>
-        </div>
-    );
-
     const onSelectChange = (selectedRowKeys) => {
-        //console.log('selectedRowKeys changed: ', selectedRowKeys[0]);
         setPreRow(selectedRowKeys[0]);
-        //console.log('preRow: ', preRow);
-        //console.log('preRequirements: ', preRequirements);
-
         if (preRequirements) {
-            // console.log("validating data");
-            // console.log("pre data: ", preRequirements[0]);
-            // console.log("pre row: ", preRow);
-            // console.log("pre id: ", BigNumber.from(preRequirements[0][preRow]).toNumber());
-            // console.log("pre type: ", BigNumber.from(preRequirements[1][preRow]).toNumber());
             setPreId(BigNumber.from(preRequirements[0][preRow]).toNumber());
             setPreType(2);
             setPreValue(BigNumber.from(preRequirements[2][preRow]).toNumber());            
@@ -276,54 +241,16 @@ function OpportunityEditScreen ({
         }        
     };
 
-    const getDataConverted = (unixTime) => {
-        //console.log("unix time received: ", unixTime);
-        
-        //let dateTime = moment.unix(unixTime);
-        // let dateTime;
-
-        // if (unixTime == 1609337804) {
-        //     console.log("access to 1");
-        //     dateTime = moment('2015/12/05', dateFormat);
-        // } else {
-        //     console.log("access to 2");
-        //     dateTime = moment('2015/12/07', dateFormat);
-        // }
-        //let  dateTime = moment('2015/12/05', dateFormat);
-        
-        //const dateTime = moment(unixTime).format(dateFormat);
-        //const dateTime2 = moment(unixTime);
-        //moment.unix(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat);
-        
-        //console.log("formatted date: ", dateTime.format(dateFormat));
-        //console.log("formatted date 2: ", dateTime2.format(dateFormat));
-
+    const getDataConverted = (unixTime) => {        
         let dateTimeTest = moment.unix(unixTime);
         let dateTimeText = dateTimeTest.format(dateFormat).toString();
-        //console.log("text time: ", dateTimeText);
         let dateTimeFormatted = moment(dateTimeText, dateFormat);
         return dateTimeFormatted;
     }
 
-    const getPreRequirementConverted = (unixTime) => {
-        //console.log("unix time received: ", unixTime);
-        
-        //let dateTime = moment.unix(unixTime);
-        //let dateTime = moment('2015/12/07', dateFormat);
-        //let  dateTime = moment('2015/12/05', dateFormat);
-        
-        //const dateTime = moment(unixTime).format(dateFormat);
-        //const dateTime2 = moment(unixTime);
-        //moment.unix(BigNumber.from(opportunity[3]).toNumber()).format(dateFormat);
-        
-        //console.log("formatted date: ", dateTime.format(dateFormat));
-        //console.log("formatted date 2: ", dateTime2.format(dateFormat));
-
+    const getPreRequirementConverted = (unixTime) => {        
         let dateTimeTest = moment.unix(unixTime);
-        let dateTimeText = dateTimeTest.format(dateFormat).toString();
-        
         let dateTimeFormatted = moment(moment.unix(unixTime).format("L"), dateFormat);
-        //console.log("pre requirement date: ", dateTimeFormatted);
         return dateTimeFormatted;
     }
 
@@ -465,22 +392,7 @@ function OpportunityEditScreen ({
                         label="Images"
                         valuePropName="opp-images"
                     >
-                        <Upload action={uploadImage}>
-                            <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                        </Upload>
-                        {/* <Upload
-                            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                            listType="picture-card"
-                            >
-                            {uploadButton}
-                        </Upload>
-                        <Modal
-                            visible={false}
-                            title={"Test"}
-                            footer={null}
-                            >
-                            <img alt="example" style={{ width: '100%' }} />
-                        </Modal> */}
+                        <input type="file" onChange={(e) => { uploadImage(e) }} />
                     </Form.Item>                
                     <Form.Item>
                         <Row gutter={[100, 16]}>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col, Tag, Card, Avatar, List, Layout, Tooltip, Button } from "antd";
 import { FileSearchOutlined, CalendarOutlined, FormOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
@@ -8,6 +8,7 @@ import opportunityImage from "../assets/images/opportunity_detail.png";
 import moment from "moment";
 import { BigNumber } from "@ethersproject/bignumber";
 import { useTranslation } from "react-i18next";
+//const ipfsClient = require("ipfs-http-client");
 
 const { Meta } = Card;
 
@@ -22,30 +23,34 @@ function OpportunityScreen ({
   
   const readContracts = useContractLoader(localProvider);
   const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
+  //const [imageUrl, setImageUrl] = useState();
+  //const [imageHash, setImageHash] = useState();
+  const [imageStream, setImageStream] = useState();
   
-  const dateFormat = 'MM/DD/YYYY';
+  const dateFormat = process.env.REACT_APP_DATE_FORMAT;
   const length = 250; // description max characters to show in preview
+  let count = 0;
 
   const oppData = () => {
     let data = [];
     if (opportunities) {
-        for (let i = 0; i < opportunities[0].length; i++) {
-            data.push({
-                id: BigNumber.from(opportunities[0][i]).toNumber(),
-                key: BigNumber.from(opportunities[0][i]).toNumber(),
-                organizationName: opportunities[1][i],
-                name: opportunities[2][i],
-                description: opportunities[3][i],                
-                preRequirementsDeadline: BigNumber.from(opportunities[4][i]).toNumber(),
-                status: BigNumber.from(opportunities[5][i]).toNumber(),
-                image: opportunityImage,
-                avatar: opportunityAvatar,
-                tags: ["youth", "activism"]
-            });
-        }   
+      for (let i = 0; i < opportunities[0].length; i++) {
+        data.push({
+          id: BigNumber.from(opportunities[0][i]).toNumber(),
+          key: BigNumber.from(opportunities[0][i]).toNumber(),
+          organizationName: opportunities[1][i],
+          name: opportunities[2][i],
+          description: opportunities[3][i],
+          imageHash: opportunities[4][i],
+          preRequirementsDeadline: BigNumber.from(opportunities[5][i]).toNumber(),
+          status: BigNumber.from(opportunities[6][i]).toNumber(),
+          image: opportunityImage,
+          avatar: opportunityAvatar
+        });
+      }   
     }
     return data;
-}
+  }
 
   return (
     <Layout className="site-layout">      
@@ -88,7 +93,7 @@ function OpportunityScreen ({
                 cover={
                   <img
                     alt={item.name}
-                    src={item.image}
+                    src={`https://${item.imageHash}.${process.env.REACT_APP_INFURA_GATEWAY}`}
                   />
                 }
                 actions={ role === "organization" && [
