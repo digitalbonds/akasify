@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { Button, Layout, Row, Typography, Col, Card, Avatar, Tabs, Result, Table, Carousel, Tooltip, Divider, Steps, Form, Input, Modal } from "antd";
-import { CalendarOutlined, LoadingOutlined, TagOutlined, FileProtectOutlined, DatabaseOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { LoadingOutlined, FileProtectOutlined, DatabaseOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import { useContractLoader, useContractReader, useBalance, useEventListener, useExchangePrice } from "../hooks";
+import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
 import { Transactor } from "../helpers";
-import opportunityAvatar from "../assets/images/opportunity_avatar.png";
 import * as moment from "moment";
 import { BigNumber } from "@ethersproject/bignumber";
 import oasisLogo from "../assets/images/oasis_logo.png";
@@ -13,7 +12,7 @@ import oasisLogo from "../assets/images/oasis_logo.png";
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 const { Meta } = Card;
-const { Paragraph, Text } = Typography;
+const { Paragraph } = Typography;
 const { Step } = Steps;
 
 function OpportunityDetailScreen({
@@ -35,13 +34,20 @@ function OpportunityDetailScreen({
   
   // APPLICATION
   const [appId, setAppId] = useState(0);
-  const [appOpportunityId, setAppOpportunityId] = useState(0);
+  const [appOpportunityId, setAppOpportunityId] = useState(0);  
   const [appBeneficiaryId, setAppBeneficiaryId] = useState(0);
   const [appCreationDate, setAppCreationDate] = useState(0);
   const [appLastUpdate, setAppLastUpdate] = useState(0);
   const [appStatus, setAppStatus] = useState(0);
 
-  //const [oppImage, setOppImage] = useState("");
+  // OPPORTUNITY
+  const [opportunityOrganizationId, setOpportunityOrganizationId] = useState();
+  const [opportunityName, setOpportunityName] = useState();
+  const [opportunityImage, setOpportunityImage] = useState("");
+
+  // ORGANIZATION
+  const [organizationName, setOrganizationName] = useState();
+  const [organizationImage, setOrganizationImage] = useState("");
 
   // PRE ACCOMPLISHMENT
   const [preAcId, setPreAcId] = useState(0);
@@ -63,17 +69,31 @@ function OpportunityDetailScreen({
 
   // SMART CONTRACT HOOKS
   const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
-  //setOppImage(opportunity && opportunity[3]);
-  console.log("opportunity data: ", opportunity && opportunity[3]);
+  const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", [opportunityOrganizationId]);
   const application = useContractReader(readContracts, 'AkasifyCoreContract', "getApplication", [id.replace(":",""), address]);
   const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
-  //const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
+  const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));  
   const preAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPreAccomplishmentsByApplicationId', [appId]);
-  //const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);  
+  const postAccomplishments = useContractReader(readContracts, 'AkasifyCoreContract', 'getPostAccomplishmentsByApplicationId', [appId]);  
 
   // SMART CONTRACT BROADCAST
   const setApplicationCreateEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterApplication", localProvider, 1);
   const setPreAccomplishmentCreateEvents = useEventListener(readContracts, "AkasifyCoreContract", "RegisterApplicationPreAccomplishment", localProvider, 1);
+
+  useEffect(() => {
+    if (opportunity && opportunityName != opportunity[1]) {
+      setOpportunityOrganizationId(BigNumber.from(opportunity[0]).toNumber());
+      setOpportunityName(opportunity[1]);
+      setOpportunityImage(opportunity[3]);
+    }
+  }, [opportunity]);
+
+  useEffect(() => {
+    if (organization && organizationName != organization[1]) {
+      setOrganizationName(organization[1]);
+      setOrganizationImage(organization[2]);     
+    }
+  }, [organization]);
 
   useEffect(() => {
     if (application && application.length > 0 && appLastUpdate != BigNumber.from(application[4]).toNumber()) {
@@ -126,6 +146,21 @@ function OpportunityDetailScreen({
     return 0;
   }
 
+  const currentPostRequirement = () => {
+    if (postAccomplishments && postAccomplishments.length > 0 && postAccomplishments[0].length > 0) {
+      if (BigNumber.from(postAccomplishments[1][postAccomplishments[1].length - 1]).toNumber()) {
+        if (BigNumber.from(postAccomplishments[3][postAccomplishments[3].length - 1]).toNumber() == 1) {
+          // PRE REQUIREMENT INITIATED
+          return BigNumber.from(postAccomplishments[1][postAccomplishments[1].length - 1]).toNumber();
+        } else {
+          // PRE REQUIREMENT FINALIZED
+          return BigNumber.from(postAccomplishments[1][postAccomplishments[1].length - 1]).toNumber() + 1;
+        }
+      }
+    }
+    return 0;
+  }
+
   const uploadData = async () => {
     console.log("api token: ", localStorage.getItem('akasify-oasis-token'));
     const response = await fetch(`${process.env.REACT_APP_PARCEL_API_URL}/beneficiaries/createStep`, {
@@ -167,6 +202,18 @@ function OpportunityDetailScreen({
     }
   }
 
+  const onPostAccomplishmentCreate = () => {
+    if (localStorage.getItem('akasify-oasis-address') == "" && localStorage.getItem('akasify-oasis-token') == "") {
+      setOasisModalVisible(true);
+    } else {
+      setPreAccomplishmentModalStep(0);
+      setPreAccomplishmentModalVisible(true);
+
+      // UPLOADING DATA TO OASIS
+      uploadData();
+    }
+  }
+
   const preRequirementData = () => {
     let data = [];
     if (preRequirements && preRequirements.length > 0) {
@@ -183,7 +230,25 @@ function OpportunityDetailScreen({
       }
     }
     return data;
-};
+  };
+
+  const postRequirementData = () => {
+    let data = [];
+    if (postRequirements && postRequirements.length > 0) {
+      for (let i = 0; i < postRequirements[0].length; i++) {
+        data.push(
+          {
+            id: BigNumber.from(postRequirements[0][i]).toNumber(),
+            key: BigNumber.from(postRequirements[0][i]).toNumber(),
+            type: BigNumber.from(postRequirements[1][i]).toNumber(),
+            value: BigNumber.from(postRequirements[2][i]).toNumber(),
+            name: postRequirements[3][i]
+          }
+        )
+      }
+    }
+    return data;
+  };
 
   const columns = [
     {
@@ -226,19 +291,43 @@ function OpportunityDetailScreen({
       }
     }
     return data;
-};
+  };
+
+  const postAccomplishmentData = () => {
+    let data = [];    
+    if (postAccomplishments) {
+      for (let i = 0; i < postAccomplishments[0].length; i++) {
+        let aT = "";
+        if (BigNumber.from(postAccomplishments[3][i]).toNumber() == 1) {
+          aT = "step initiated automatically by smart contract";
+        } else {
+          aT = postAccomplishments[4][i];
+        }
+        data.push(
+            {
+                id: BigNumber.from(postAccomplishments[0][i]).toNumber(),
+                key: BigNumber.from(postAccomplishments[0][i]).toNumber(),
+                tags: BigNumber.from(postAccomplishments[3][i]).toNumber() == 1 ? "started" : "finished",
+                value: postAccomplishments[4][i],
+                name: aT
+            }
+        );
+      }
+    }
+    return data;
+  };
 
   const contentStyle = {
-    width: "100%",
-    height: "300px",
-    objectFit: "cover",
-
-    // maxWidth: "100%",
+    // width: "100%",
     // height: "300px",
-    // display: "block",
-    // marginLeft: "auto",
-    // marginRight: "auto",
-    // overflow: "hidden",
+    // objectFit: "cover",
+
+    maxWidth: "100%",
+    height: "300px",
+    display: "block",
+    marginLeft: "auto",
+    marginRight: "auto",
+    overflow: "hidden"
 
     // width: "100%",
     // height: "300px",
@@ -272,13 +361,17 @@ function OpportunityDetailScreen({
             <div key={1}>
               <img
                 style={contentStyle}
-                src={`https://${opportunity ? opportunity[3] : ""}.${process.env.REACT_APP_INFURA_GATEWAY}`} />            
+                src={`https://${opportunityImage ?? "none"}.${process.env.REACT_APP_INFURA_GATEWAY}`} />
             </div>
           </Carousel>
         }
       >
         <Meta
-          avatar={<Avatar src={opportunityAvatar} />}
+          avatar={
+            <Avatar
+            src={`https://${organizationImage ?? "none"}.${process.env.REACT_APP_INFURA_GATEWAY}`}
+            />
+            }
           title={opportunity && opportunity[1]}
           description={
             <div className="opportunity-detail-card">
@@ -337,7 +430,7 @@ function OpportunityDetailScreen({
       <Tabs defaultActiveKey="1" centered={true}>
         <TabPane tab="Pre requirements" key={1}>
           <Row>
-            <Col span={5}>              
+            <Col span={5}>
               <Steps direction="vertical" current={currentPreRequirement()}>
                 {preRequirementData().map(preRequirement => {
                   return (<Step key={preRequirement.id} title={preRequirement.name} />)
@@ -382,10 +475,56 @@ function OpportunityDetailScreen({
                 </Form.Item>
               </Form>
             </Col>
-          </Row>          
+          </Row>
         </TabPane>
         <TabPane tab="Post requirements" key={2}>
-          Content of Tab Pane post
+          <Row>
+            <Col span={5}>
+              <Steps direction="vertical" current={currentPostRequirement()}>
+                {postRequirementData().map(postRequirement => {
+                  return (<Step key={postRequirement.id} title={postRequirement.name} />)
+                })}
+              </Steps>
+            </Col>
+            <Col span={18} offset={1}>
+              <Table
+                columns={columns}
+                dataSource={postAccomplishmentData()}
+              />
+              <Form
+                  layout="vertical"
+                  style={{marginTop: "12px"}}
+                  form={preAccomplishmentForm}
+                  onFinish={onPostAccomplishmentCreate}
+              >
+                <Form.Item
+                    name="post-accomplishment-value"
+                    label="Value"
+                    valuePropName="post-accomplishment-value"
+                    // rules={[
+                    //     {
+                    //     required: true,
+                    //     message: 'Please input the post accomplishment value',
+                    //     },
+                    // ]}
+                >
+                    <TextArea
+                        autoSize={{ minRows: 10, maxRows: 20 }}
+                        disabled={ appStatus === 1 ? false : true }
+                        value={preAcValue}
+                        onChange={e => setPreAcValue(e.target.value)}
+                    />
+                </Form.Item>
+                <Form.Item>
+                    <Row gutter={[100, 16]}>
+                        <Col span={1}>
+                            <Button type="primary" htmlType="submit" disabled={ appStatus === 1 ? false : true }>Save</Button>
+                        </Col>
+                    </Row>
+                </Form.Item>
+              </Form>
+            </Col>
+          </Row>
         </TabPane>
       </Tabs>
       <Modal

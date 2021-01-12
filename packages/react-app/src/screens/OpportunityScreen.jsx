@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { Row, Col, Tag, Card, Avatar, List, Layout, Tooltip, Button } from "antd";
+import { Row, Col, Card, Avatar, List, Layout, Tooltip, Button } from "antd";
 import { FileSearchOutlined, CalendarOutlined, FormOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import { useContractLoader, useContractReader } from "../hooks";
-import opportunityAvatar from "../assets/images/opportunity_avatar.png";
-import opportunityImage from "../assets/images/opportunity_detail.png";
 import moment from "moment";
 import { BigNumber } from "@ethersproject/bignumber";
 import { useTranslation } from "react-i18next";
-//const ipfsClient = require("ipfs-http-client");
 
 const { Meta } = Card;
 
@@ -54,9 +51,7 @@ function OpportunityScreen ({
           description: opportunities[3][i],
           imageHash: opportunities[4][i],
           preRequirementsDeadline: BigNumber.from(opportunities[5][i]).toNumber(),
-          status: BigNumber.from(opportunities[6][i]).toNumber(),
-          image: opportunityImage,
-          avatar: opportunityAvatar
+          status: BigNumber.from(opportunities[6][i]).toNumber()
         });
       }   
     }
@@ -119,7 +114,6 @@ function OpportunityScreen ({
                 <Meta
                   avatar={
                     <Avatar
-                      //src={item.avatar}
                       src={`https://${item.organizationImage}.${process.env.REACT_APP_INFURA_GATEWAY}`}
                     />
                   }

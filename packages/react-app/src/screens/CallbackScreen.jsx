@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { Redirect, useHistory, withRouter } from 'react-router-dom'
-import { Layout } from 'antd'
-import * as moment from 'moment'
-import { parcelConfig } from '../helpers/parcelConfig'
-import { OidcClient, Log } from 'oidc-client'
-import jwt_decode from 'jwt-decode'
-
-const { Content, Footer } = Layout
+import React, { useState, useEffect } from "react";
+import { Redirect, useHistory, withRouter } from "react-router-dom";
+import { parcelConfig } from "../helpers/parcelConfig";
+import { OidcClient } from "oidc-client";
+import jwt_decode from "jwt-decode";
 
 function CallbackScreen() {
 
@@ -23,8 +19,8 @@ function CallbackScreen() {
           const idToken = response.id_token;
           const decoded = jwt_decode(idToken);
           const address = decoded.sub;
-          localStorage.setItem('akasify-oasis-address', address);
-          localStorage.setItem('akasify-oasis-token', access_token);
+          localStorage.setItem("akasify-oasis-address", address);
+          localStorage.setItem("akasify-oasis-token", access_token);
 
           console.log("history, ", history);
 
@@ -34,7 +30,7 @@ function CallbackScreen() {
         callback();
       }, [logIn]);
 
-      return logIn ? <Redirect to={localStorage.getItem('akasify-oasis-previous')} /> : '';
+      return logIn ? <Redirect to={localStorage.getItem("akasify-oasis-previous")} /> : "";
 }
 
 export default withRouter(CallbackScreen);

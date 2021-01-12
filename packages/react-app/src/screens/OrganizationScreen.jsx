@@ -1,9 +1,7 @@
 import React from "react";
-import { Row, Col, Avatar, List, Layout, Space, Statistic } from "antd";
+import { Row, Col, Avatar, List, Layout, Statistic } from "antd";
 import { FormOutlined } from "@ant-design/icons";
 import { useContractLoader, useContractReader } from "../hooks";
-import organizationAvatar from "../assets/images/opportunity_avatar.png";
-import organizationImage from "../assets/images/opportunity_detail.png";
 import moment from "moment";
 import { BigNumber } from "@ethersproject/bignumber";
 
@@ -21,7 +19,6 @@ function OrganizationScreen ({
   logoutOfWeb3Modal
 }) {
 
-  const dateFormat = process.env.REACT_APP_DATE_FORMAT;
   const readContracts = useContractLoader(localProvider);
   const organizations = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizations");
   const opportunities = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunities");
@@ -86,7 +83,7 @@ function OrganizationScreen ({
                             <Row justify="space-between">
                                 <Col span={4}>Register date:</Col>
                                 <Col span={20}>
-                                    {moment.unix(item.registerDate).format(dateFormat)}
+                                    {moment.unix(item.registerDate).format(process.env.REACT_APP_DATE_FORMAT)}
                                 </Col>
                             </Row>
                         </div>

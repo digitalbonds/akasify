@@ -131,7 +131,7 @@ function App(props) {
               <Route path='/opportunity' render={() => <OpportunityScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} />}/>
               <Route path='/organization:id' render={() => <OpportunityDetailScreen /> } />
               <Route path='/organization' render={() => <OrganizationScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} role={role} /> } />
-              <Route path='/profile' component={ProfileScreen} />
+              {/* <Route path='/profile' component={ProfileScreen} /> */}
               <Route path='/register' render={() => <RegisterScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>
               <Route path='/sucess' render={() => <RegisterSucessScreen />}/>
               <Route path='/admin' render={() => <AdminScreen address={address} gasPrice={gasPrice} userProvider={userProvider} localProvider={localProvider} mainnetProvider={mainnetProvider} tx={tx} />}/>

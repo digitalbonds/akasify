@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select, Upload, Modal } from "antd";
-import { ConsoleSqlOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select } from "antd";
 import { useParams, useHistory } from "react-router-dom";
-import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
+import { useContractLoader, useContractReader } from "../hooks";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -36,7 +35,7 @@ function OpportunityEditScreen ({
     console.log("id param: ", id);
 
     const opportunity = useContractReader(readContracts, 'AkasifyCoreContract', "getOpportunityById", id.replace(":",""));
-    const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationById", id.replace(":",""));
+    const organization = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizationByAddress", [address]);
     const preRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPreRequirementsByOpportunityId", id.replace(":",""));
     const postRequirements = useContractReader(readContracts, 'AkasifyCoreContract', "getPostRequirementsByOpportunityId", id.replace(":",""));
     
@@ -209,7 +208,15 @@ function OpportunityEditScreen ({
     };
 
     const onOppCreate = () => {
-       tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppImageHash, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));        
+        let currentId = id.replace(":","");
+        if (currentId == "NaN") {
+            // New Opportunity
+            tx(writeContracts.AkasifyCoreContract.createOpportunity(oppName, oppDescription, oppImageHash, oppPreRequirementDeadline, oppPosRequirementDeadline, [], [], [], [], [], []));
+            // Redirect to opportunities page
+            history.push('/opportunity');
+        } else {
+            // Update Opportunity
+        }
     };
 
     const onOppUpdateStatus = (e) => {

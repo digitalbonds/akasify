@@ -85,7 +85,7 @@ const ProfileDrawer = ({
                     {modalButtons}
                 </Col>
             </Row>
-            <Divider orientation="center">Last appllications</Divider>
+            {/* <Divider orientation="center">Last applications</Divider> */}
             <Divider orientation="center">Balance</Divider>
             <Row>
                 <Col span={9}>

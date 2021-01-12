@@ -21,8 +21,8 @@ function AdminScreen ({
     const readContracts = useContractLoader(localProvider);
     const writeContracts = useContractLoader(userProvider);
 
-    const organizations = useContractReader(readContracts, 'AkasifyCoreContract', "getOrganizations");
-    const beneficiaries = useContractReader(readContracts, 'AkasifyCoreContract', "getBeneficiaries");
+    const organizations = useContractReader(readContracts, "AkasifyCoreContract", "getOrganizations");
+    const beneficiaries = useContractReader(readContracts, "AkasifyCoreContract", "getBeneficiaries");
 
     const [orgForm] = Form.useForm();
     const [orgName, setOrgName] = useState("");
@@ -34,33 +34,33 @@ function AdminScreen ({
 
     const orgColumns = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
             render: text => <a>{text}</a>,
         },
         {
-            title: 'Account',
-            dataIndex: 'account',
-            key: 'account',
+            title: "Account",
+            dataIndex: "account",
+            key: "account",
         },
         {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
         },
     ];
 
     const benColumns = [
         {
-            title: 'Account',
-            dataIndex: 'account',
-            key: 'account',
+            title: "Account",
+            dataIndex: "account",
+            key: "account",
         },
         {
-            title: 'Status',
-            key: 'status',
-            dataIndex: 'status',
+            title: "Status",
+            key: "status",
+            dataIndex: "status",
         }
     ];
 
@@ -69,7 +69,7 @@ function AdminScreen ({
         if (organizations) {
             for (let i = 0; i < organizations[0].length; i++) {
                 let status = "";
-                switch (BigNumber.from(organizations[4][i]).toNumber()) {
+                switch (BigNumber.from(organizations[5][i]).toNumber()) {
                     case 1:
                         status = "waiting for approval";
                         break;
@@ -87,7 +87,7 @@ function AdminScreen ({
                     id: BigNumber.from(organizations[0][i]).toNumber(),
                     key: BigNumber.from(organizations[0][i]).toNumber(),
                     name: organizations[1][i],
-                    account: organizations[2][i],
+                    account: organizations[3][i],
                     status: status
                 });
             }   
@@ -114,14 +114,13 @@ function AdminScreen ({
     };
 
     const onBenFinish = () => {
-        tx(writeContracts['AkasifyCoreContract'].registerBeneficiaryByAdmin(benAccount, 3));
+        tx(writeContracts["AkasifyCoreContract"].registerBeneficiaryByAdmin(benAccount, 3));
     };
 
     const uploadImage = async (e) => {
         const file = e.target.files[0];
         const added = await ipfs.add(file);
-        let v1cid = added.cid.toV1().toBaseEncodedString('base32');
-        console.log("ipfs image hash: ", v1cid);
+        let v1cid = added.cid.toV1().toBaseEncodedString("base32");
         setOrgImageHash(v1cid);
     }
 
@@ -144,7 +143,7 @@ function AdminScreen ({
                         rules={[
                             {
                               required: true,
-                              message: 'Please input the organization name',
+                              message: "Please input the organization name",
                             },
                         ]}
                     >
@@ -160,7 +159,7 @@ function AdminScreen ({
                         rules={[
                             {
                               required: true,
-                              message: 'Please input the organization account',
+                              message: "Please input the organization account",
                             },
                         ]}
                     >
@@ -198,7 +197,7 @@ function AdminScreen ({
                         rules={[
                             {
                               required: true,
-                              message: 'Please input the beneficiary account',
+                              message: "Please input the beneficiary account",
                             },
                         ]}
                     >

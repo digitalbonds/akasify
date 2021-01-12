@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, Tag, DatePicker, Select } from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { Row, Col, Table, Layout, Tabs, Typography, Form, Input, Button, DatePicker } from "antd";
 import { useParams, useHistory, NavLink } from "react-router-dom";
-import { useContractLoader, useContractReader, useBalance, useEventListener } from "../hooks";
+import { useContractLoader, useContractReader } from "../hooks";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { BigNumber } from "@ethersproject/bignumber";
 const { Title } = Typography;
 const { TextArea } = Input;
-const { Option } = Select;
 const { TabPane } = Tabs;
 
 function ApplicationReviewScreen ({

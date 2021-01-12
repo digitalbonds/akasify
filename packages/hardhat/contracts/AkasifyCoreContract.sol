@@ -447,6 +447,44 @@ contract AkasifyCoreContract {
 
     }
 
+    // function getApplicationsByBeneficiaryAddress(address benficiaryAddress) 
+    //     public view returns(uint[] memory, uint[] memory, uint[] memory, uint[] memory, uint[] memory) {
+
+    //     uint beneficiaryId = 0;
+    //     for (uint i = 0; i < nextBeneficiaryId; i++) {
+    //         Beneficiary memory _beneficiary = beneficiaries[i];
+    //         if (_beneficiary.account == benficiaryAddress) {
+    //             beneficiaryId = _beneficiary.id;
+    //         }
+    //     }
+
+    //     uint applicationCount = 0;
+    //     for (uint i = 0; i < nextApplicationId; i++) {
+    //         Application memory _application = applications[i];
+    //         if (_application.beneficiaryId == beneficiaryId) {
+    //             applicationCount++;
+    //         }
+    //     }
+
+    //     uint[] memory appIds = new uint[](applicationCount);
+    //     uint[] memory appOpportunityIds = new uint[](applicationCount);
+    //     uint[] memory appCreationDates = new uint[](applicationCount);
+    //     uint[] memory appLastUpdates = new uint[](applicationCount);
+    //     uint[] memory appStatus = new uint[](applicationCount);
+    //     for (uint i = 0; i < nextApplicationId; i++) {
+    //         Application memory _application = applications[i];
+    //         if (_application.beneficiaryId == beneficiaryId) {
+    //             appIds[i] = _application.id;
+    //             appOpportunityIds[i] = _application.opportunityId;
+    //             appCreationDates[i] = _application.creationDate;
+    //             appLastUpdates[i] = _application.lastUpdate;
+    //             appStatus[i] = _application.status;
+    //         }
+    //     }
+
+    //     return (appIds, appOpportunityIds, appCreationDates, appLastUpdates, appStatus);
+    // }
+
     function getPreRequirementsByOpportunityId(uint opportunityId) 
         public view returns(uint[] memory, uint[] memory, uint[] memory, string[] memory) {
 
