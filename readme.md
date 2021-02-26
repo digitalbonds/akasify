@@ -8,11 +8,9 @@
 
 * [Pitch](https://youtu.be/MVZaqq95WWA)
 
-## Oasis Network Quest Hackathon
+## Past awards
 
-* [Pitch (2 min)](https://youtu.be/sug8reOlwJAX)
-* [Demo Parcel](https://youtu.be/_4OSDec_gs4)
-* [Demo ParaTime](https://youtu.be/fmPnBef7oOo)
+* [Blog Post Spotlight](https://medium.com/oasis-protocol-project/hackathon-winners-spotlight-akasify-64fb04b0604e)
 
 ## Featured Technology
 
@@ -21,7 +19,6 @@
 </p>
 
 * [Oasis Labs - Parcel](https://www.oasislabs.com)
-* [Oasis Ethereum - ParaTime](https://www.oasiseth.org/#developers)
 
 ## Documentation
 
